@@ -19,6 +19,8 @@ Use `WebFetch`, `WebSearch`, or uploaded docs before writing code or giving defi
 | UI/UX patterns, similar tools, hackathon inspiration | Browse [Fiber Showcase](https://www.fiber.world/showcase) |
 | TypeScript style, types, declarations | Read [W3Schools TS Best Practices](https://www.w3schools.com/typescript/typescript_best_practices.php) and [TS Handbook: Do's and Don'ts](https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html) |
 | Unclear errors, version mismatches, edge cases | Search Fiber docs FAQ/Troubleshooting sections before improvising fixes |
+| Hackathon scope, category fit, submission requirements | Read [Gone in 60ms announcement](https://talk.nervos.org/t/gone-in-60ms-fiber-network-infrastructure-hackathon-announcement/10418) and CKBoost campaign rules |
+| VS Code extension (`apps/vscode`) — commands, views, manifest, publishing | Read [VS Code Extension API](https://code.visualstudio.com/api) and relevant guides before implementing |
 
 ## Reference Links
 
@@ -28,6 +30,8 @@ Use `WebFetch`, `WebSearch`, or uploaded docs before writing code or giving defi
 - **Community projects**: https://www.fiber.world/showcase
 - **TypeScript best practices**: https://www.w3schools.com/typescript/typescript_best_practices.php
 - **TypeScript declaration do's/don'ts**: https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html
+- **Hackathon announcement & rules**: https://talk.nervos.org/t/gone-in-60ms-fiber-network-infrastructure-hackathon-announcement/10418
+- **VS Code Extension API**: https://code.visualstudio.com/api
 
 ## Rules of Engagement
 
@@ -36,3 +40,96 @@ Use `WebFetch`, `WebSearch`, or uploaded docs before writing code or giving defi
 3. **Prefer official SDK** — wrap or extend `@ckb-ccc/fiber` in `packages/fiber-rpc` rather than reimplementing JSON-RPC from scratch unless there is a clear reason.
 4. **Cite sources** — when explaining protocol behavior to the user, link to the relevant doc section.
 5. **Debug with docs** — map raw RPC errors to documented failure modes (channels, payments, routing) before writing diagnostic copy.
+6. **VS Code extension** — follow [VS Code Extension API](https://code.visualstudio.com/api) for `apps/vscode`; do not guess contribution points, activation events, or API usage. See subsection below.
+
+## VS Code Extension (`apps/vscode`)
+
+When building or debugging the FiberGuard VS Code extension, use the official [Extension API docs](https://code.visualstudio.com/api) as the source of truth.
+
+Consult these sections as needed:
+
+| Task | Doc section |
+|------|-------------|
+| First-time setup, anatomy, Hello World | [Get Started](https://code.visualstudio.com/api/get-started/your-first-extension) |
+| Commands, tree views, webviews, notifications | [Extension Guides](https://code.visualstudio.com/api/extension-guides/overview) — especially [Command](https://code.visualstudio.com/api/extension-guides/command), [Tree View](https://code.visualstudio.com/api/extension-guides/tree-view) |
+| Sidebars, status bar, command palette UX | [UX Guidelines](https://code.visualstudio.com/api/ux-guidelines/overview) |
+| `package.json` contributions, activation | [Extension Manifest](https://code.visualstudio.com/api/references/extension-manifest), [Contribution Points](https://code.visualstudio.com/api/references/contribution-points), [Activation Events](https://code.visualstudio.com/api/references/activation-events) |
+| API types and methods | [VS Code API Reference](https://code.visualstudio.com/api/references/vscode-api) |
+| Testing, bundling, publishing | [Testing Extensions](https://code.visualstudio.com/api/working-with-extensions/testing-extension), [Bundling](https://code.visualstudio.com/api/working-with-extensions/bundling-extension), [Publishing](https://code.visualstudio.com/api/working-with-extensions/publishing-extension) |
+| Code samples | [vscode-extension-samples](https://github.com/microsoft/vscode-extension-samples) |
+
+Extension-specific FiberGuard conventions remain in `vscode-extension.mdc`; protocol and RPC docs take precedence for Fiber logic, VS Code docs for editor integration.
+
+
+## Hackathon: Gone in 60ms
+
+**Always align scope, features, and deliverables with the official announcement:**
+https://talk.nervos.org/t/gone-in-60ms-fiber-network-infrastructure-hackathon-announcement/10418
+
+Re-read this page when scoping work, prioritizing features, or preparing submission materials. Full rules also live on the CKBoost campaign page linked from the announcement.
+
+### Mission & boundaries
+
+| Rule | Implication for FiberGuard |
+|------|----------------------------|
+| **Infrastructure only** — not consumer apps built on top | FiberGuard is operator/developer **tooling**, not a wallet, game, or merchant product |
+| Mission: *"Build reusable infrastructure that makes Fiber easier to use, integrate, operate, or productise"* | Prioritize reusable packages (`diagnostics`, `fiber-rpc`) and clear integration paths for other builders |
+| Key question: *Does this help future developers, wallets, merchants, services, or users interact with Fiber more easily?* | Every feature should answer this; cut vanity UI that doesn't improve Fiber reliability or debuggability |
+| **Part 1** of a broader initiative — apps hackathon comes later | Stay in the infrastructure lane; don't pivot into checkout, games, or end-user micropayment apps |
+
+### Submission category
+
+FiberGuard targets **Category 2: Node, Routing, Cross-Chain, and Diagnostics Infrastructure**.
+
+Relevant example directions from the announcement:
+
+- Node dashboards (health, peers, channels, connectivity)
+- Payment failure diagnostics and structured error reporting
+- Route confidence, routing analytics, payment simulation
+- Local testing / developer tooling for Fiber payment scenarios
+- Alerting for unhealthy nodes, weak routes, peer or channel issues
+
+Do **not** reposition FiberGuard as Category 1 (wallet UX) or Category 3 (merchant/LSP/checkout) unless explicitly requested.
+
+### In scope vs out of scope
+
+**In scope:** diagnostics, monitoring, can-i-pay checks, route simulation, actionable recommendations, VS Code dev tooling, open-source reusable libraries.
+
+**Out of scope for this hackathon:** custodial wallets, merchant checkout flows, LSP marketplaces, on/off-ramping, consumer-facing payment apps, purely mocked demos without real Fiber RPC integration.
+
+### Submission deliverables (plan toward these)
+
+Each submission must include — track progress in README and repo:
+
+1. Project summary and **selected category** (Category 2)
+2. Team members
+3. **Open-source repository** with runnable code
+4. **Demo link** or runnable demo instructions + hosted demo
+5. **Video demonstration**
+6. Technical breakdown
+7. Explanation of the **Fiber infrastructure gap** addressed
+8. Future roadmap
+9. AI allowance claim ($20 rebate), if applicable
+
+Be explicit in docs about what is **fully working** vs **mocked/simulated** vs **production follow-up**.
+
+### Judging criteria — optimize for
+
+- Functional completeness and technical soundness
+- User flow and experience (operator/developer, not end consumer)
+- Relevance to Fiber infrastructure and usefulness to other builders
+- Reusability, integration potential, maintainability
+- Documentation quality and practical value
+- Fit within Category 2 and potential for continued development
+
+Strong submissions should realistically become part of the wider Fiber stack — prefer solid, documented, reusable components over hacky one-offs.
+
+### AI usage (hackathon policy)
+
+AI may be used for research, development, and documentation. Maintain a **human-driven feedback loop and testing** — purely AI-generated projects score poorly. FiberGuard code must be functionally tested against a real Fiber node where possible.
+
+### Timeline (reference)
+
+- Hackathon: **1 July – 15 July** (submission deadline **15 July 23:59 UTC**)
+- Platform: **CKBoost**; pre-registration required; testnet CKB from Nervos Pudge Faucet
+

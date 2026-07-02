@@ -20,6 +20,7 @@ alwaysApply: false
 
 ## Extension API
 
+- Follow [VS Code Extension API](https://code.visualstudio.com/api) — see `documentation-references.mdc` for doc map
 - Use `vscode.window.showErrorMessage` with actionable text, not stack traces
 - Long-running RPC: progress notification with cancellation where supported
 - Never store private keys; read-only diagnostics by default
