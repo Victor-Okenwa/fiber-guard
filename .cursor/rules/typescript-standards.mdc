@@ -1,0 +1,68 @@
+---
+description: TypeScript standards and best practices for FiberGuard
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript Standards
+
+Consult official references when unsure — see `documentation-references.mdc`:
+
+- [W3Schools TypeScript Best Practices](https://www.w3schools.com/typescript/typescript_best_practices.php)
+- [TypeScript Handbook: Do's and Don'ts](https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html)
+
+## Strictness
+
+- Enable `strict` in all `tsconfig.json` files
+- No `any` — use `unknown` and narrow, or define proper types
+- Prefer `interface` for object shapes; `type` for unions, intersections, and utilities
+- Use `satisfies` when inferring a literal type while checking against a wider type
+
+## Types & Domain Modeling
+
+- Model Fiber RPC request/response shapes in `packages/shared` or `packages/fiber-rpc`
+- Use branded types for domain IDs when ambiguity is risky (e.g. `ChannelId`, `Pubkey`)
+- Export types alongside functions; consumers should not duplicate shapes
+
+```typescript
+// ✅ GOOD — explicit, shared
+export interface ChannelInfo {
+  channelId: string;
+  capacity: bigint;
+  localBalance: bigint;
+}
+
+// ❌ BAD — implicit any, duplicated inline
+function parseChannel(data: any) { ... }
+```
+
+## Error Handling
+
+- Use typed errors or Result patterns for RPC failures; never swallow errors
+- Wrap low-level errors with context: method name, params (sanitized), node URL
+- Surface user-friendly messages in UI; log technical detail separately
+
+```typescript
+// ✅ GOOD
+catch (error) {
+  throw new FiberRpcError('list_channels failed', { cause: error, method: 'list_channels' });
+}
+```
+
+## Async & Data
+
+- Prefer `async/await` over raw `.then()` chains
+- Use `bigint` for on-chain amounts and channel balances — never `number` for token values
+- Validate external JSON at boundaries (RPC responses); trust types only after parsing
+
+## Imports & Modules
+
+- Use path aliases consistently (`@fiberguard/shared`, etc.) once configured
+- No default exports for utilities — named exports aid tree-shaking and refactoring
+- Colocate tests as `*.test.ts` next to source files
+
+## Naming
+
+- `camelCase` for variables/functions; `PascalCase` for types/components
+- RPC method wrappers: verb matching Fiber API (`listChannels`, `sendPayment`)
+- React components: `PascalCase`; hooks: `use` prefix (`useNodeHealth`)

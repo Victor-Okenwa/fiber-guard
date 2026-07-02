@@ -1,0 +1,130 @@
+---
+description: FiberGuard product context — problem, solution, users, and workflows
+alwaysApply: true
+---
+
+# FiberGuard Context
+
+## The Problem
+
+Running a Fiber node is only half the job. Operators and developers must also understand **why payments fail**, **whether routes have liquidity**, and **how healthy their node is** — but Fiber exposes this through low-level JSON-RPC, protocol states, and cryptic error codes.
+
+### Pain points today
+
+| Pain | What happens | Impact |
+|------|----------------|--------|
+| **Opaque payment failures** | `sendPayment` returns `Failed` with `failedError` strings like routing or HTLC errors | Developers grep logs; users blame the app |
+| **No pre-flight checks** | Payments are fired blindly; failure discovered only after fees and latency | Wasted time, poor UX in games, agents, and checkout flows |
+| **Liquidity blindness** | Channels exist but inbound/outbound balance is wrong for the payment direction | Multi-hop payments fail despite "having funds" |
+| **Peer & graph gaps** | Missing peers, stale connections, or no path to destination | Node looks "up" but cannot route |
+| **Split tooling** | Node runs in terminal; app code in IDE; no unified diagnostics view | Slow debug loop during Fiber app development |
+| **On-chain vs off-chain confusion** | Channel pending, funding unconfirmed, or force-close in progress | Misdiagnosed as payment bugs |
+
+Existing Fiber tools ([Fiber Dashboard](https://www.fiber.world/showcase), [Fiber Studio](https://www.fiber.world/showcase)) focus on **network visibility** and **node setup**. FiberGuard focuses on **reliability engineering** — diagnosing failures, predicting outcomes, and recommending fixes.
+
+## What FiberGuard Does
+
+FiberGuard is a **diagnostics, monitoring, and reliability platform** that sits beside a local Fiber node (FNN) and optional CKB testnet RPC. It does not replace the node — it **interprets** node and chain state for humans.
+
+### Core value proposition
+
+> Turn Fiber RPC noise into clear answers: *Is my node healthy? Why did this payment fail? Can I pay this invoice? What should I fix?*
+
+### Product surfaces
+
+1. **Web dashboard** (`apps/web`) — operational overview for node operators
+2. **VS Code extension** (`apps/vscode`) — in-editor diagnostics for developers building on Fiber
+3. **Shared intelligence** (`packages/diagnostics`) — same analysis logic in both surfaces
+
+### Feature responsibilities
+
+| Feature | Solves | Behavior |
+|---------|--------|----------|
+| **Health dashboard** | "Is anything wrong?" | Node info, peer count, channel states, liquidity summary, recent payment outcomes |
+| **Channel & liquidity view** | "Do I have the right balance?" | Per-channel local/remote balance, capacity, state (`ChannelReady`, pending, etc.) |
+| **Peer & route quality** | "Can I reach the network?" | Connected peers, graph reachability signals, route history quality |
+| **Payment failure diagnostics** | "Why did it fail?" | Map `failedError`, channel state, and route context → plain-English `Diagnostic` with severity and remediation |
+| **"Can I Pay?" checker** | "Will this succeed?" | Parse invoice, simulate/check route liquidity, return success probability + blockers |
+| **Route simulation** | "What path would it take?" | Dry-run routing without sending; surface hop fees and liquidity constraints |
+| **Recommendations** | "What should I do?" | Rebalance hints, peer connect suggestions, channel capacity warnings |
+| **VS Code integration** | "Debug without leaving my editor" | Commands for node status, payment inspect, can-i-pay from invoice in clipboard |
+
+## Who It Is For
+
+### Persona 1: Node operator
+Runs FNN for routing fees or to support an app. Needs uptime, liquidity, and peer health — not raw RPC.
+
+### Persona 2: Fiber app developer
+Builds games, agents, checkout, or micropayment apps using `@ckb-ccc/fiber`. Needs fast feedback when integrations break.
+
+### Persona 3: Hackathon builder
+Standing up a demo quickly; needs confidence that payments will work before a live demo.
+
+## Key User Journeys
+
+### Journey A — Payment failed in production
+1. User reports failed payment → operator opens FiberGuard dashboard
+2. Finds payment by hash → sees diagnostic: *"Insufficient outbound liquidity on channel X toward hop Y"*
+3. Recommendation: rebalance or open/adjust channel → operator acts
+
+### Journey B — Developer integrating sendPayment
+1. Dev has invoice in VS Code → runs **Can I Pay?**
+2. FiberGuard reports 35% success probability: *"No route with sufficient liquidity; peer Z unreachable"*
+3. Dev connects peer or funds channel before demo
+
+### Journey C — Morning health check
+1. Operator opens dashboard → green/yellow/red health summary
+2. Sees pending channel, 2 failed payments overnight, 1 peer disconnected
+3. Acts on recommendations before traffic peaks
+
+## Technical Scope
+
+### In scope
+- Read-only monitoring and diagnostics against local Fiber JSON-RPC (`http://127.0.0.1:8227`)
+- CKB testnet RPC for funding/confirmation context
+- Typed clients in `packages/fiber-rpc` (wrap/extend `@ckb-ccc/fiber`)
+- Pure diagnostic logic in `packages/diagnostics` — no UI dependencies
+- Human-readable output always includes: **what**, **why**, **what to do**
+
+### Out of scope (for now)
+- Custodial wallet or key management
+- Replacing FNN or running a node for the user
+- Mainnet production ops (testnet/dev first)
+- Modifying channel state without explicit user action in their own node tools
+
+## Diagnostic Model
+
+Every failure analysis should produce a structured result:
+
+```typescript
+interface Diagnostic {
+  code: string;           // machine-readable, e.g. INSUFFICIENT_LIQUIDITY
+  severity: 'info' | 'warning' | 'error';
+  title: string;          // short headline
+  explanation: string;    // plain English
+  remediation?: string;   // actionable next step
+  context?: Record<string, unknown>; // channelId, peer, amount, etc.
+}
+```
+
+Never surface raw RPC errors alone in the UI.
+
+## Success Criteria
+
+FiberGuard is successful when a user can:
+
+1. Assess node health in **under 10 seconds** on the dashboard
+2. Understand a failed payment **without reading Fiber source code**
+3. Predict payment outcome **before** calling `sendPayment`
+4. Get the **same diagnostic** in the web app and VS Code extension
+5. Leave a hackathon demo with **fewer payment surprises**
+
+## Positioning
+
+| Tool | Focus |
+|------|-------|
+| Fiber Dashboard | Network-wide structure and activity |
+| Fiber Studio | Guided node setup (desktop) |
+| **FiberGuard** | **Node reliability, payment diagnostics, developer debug loop** |
+
+Built for **Gone in 60ms: Fiber Network Infrastructure Hackathon** — useful, technically solid, and impressive.

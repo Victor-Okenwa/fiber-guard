@@ -1,0 +1,25 @@
+---
+description: VS Code extension conventions
+globs: "apps/vscode/**/*"
+alwaysApply: false
+---
+
+# VS Code Extension Rules
+
+## Architecture
+
+- Reuse `packages/fiber-rpc`, `packages/diagnostics`, and `packages/shared` — no duplicated RPC logic
+- Extension activates on relevant commands/views; keep activation lightweight
+- Node URL configurable via VS Code settings (`fiberguard.nodeUrl`)
+
+## Commands & Views
+
+- Tree view for channels/peers; output channel for payment diagnostics
+- "Can I Pay?" as a command palette action with input for invoice/amount
+- Show diagnostics inline — same messages as web dashboard
+
+## Extension API
+
+- Use `vscode.window.showErrorMessage` with actionable text, not stack traces
+- Long-running RPC: progress notification with cancellation where supported
+- Never store private keys; read-only diagnostics by default

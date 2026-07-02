@@ -1,0 +1,38 @@
+---
+description: Look up official docs and references for tasks, debugging, and questions
+alwaysApply: true
+---
+
+# Documentation & Research
+
+When implementing features, debugging, or answering questions, **consult official sources first** — do not guess Fiber/CKB protocol behavior or RPC shapes.
+
+Use `WebFetch`, `WebSearch`, or uploaded docs before writing code or giving definitive answers.
+
+## When to Look Things Up
+
+| Situation | Action |
+|-----------|--------|
+| Fiber RPC methods, types, payment flows | Read [Fiber Docs](https://www.fiber.world/docs) and [RPC API Reference](https://www.fiber.world/docs) |
+| JS/TS integration, `FiberSDK`, channels/invoices | Read [JavaScript SDK](https://www.fiber.world/docs/build/sdk/js) — prefer `@ckb-ccc/fiber` patterns |
+| CKB on-chain context, cells, scripts, RPC | Read [CKB Docs](https://docs.nervos.org/docs) |
+| UI/UX patterns, similar tools, hackathon inspiration | Browse [Fiber Showcase](https://www.fiber.world/showcase) |
+| TypeScript style, types, declarations | Read [W3Schools TS Best Practices](https://www.w3schools.com/typescript/typescript_best_practices.php) and [TS Handbook: Do's and Don'ts](https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html) |
+| Unclear errors, version mismatches, edge cases | Search Fiber docs FAQ/Troubleshooting sections before improvising fixes |
+
+## Reference Links
+
+- **CKB**: https://docs.nervos.org/docs
+- **Fiber (overview & concepts)**: https://www.fiber.world/docs
+- **Fiber JS/TS SDK**: https://www.fiber.world/docs/build/sdk/js
+- **Community projects**: https://www.fiber.world/showcase
+- **TypeScript best practices**: https://www.w3schools.com/typescript/typescript_best_practices.php
+- **TypeScript declaration do's/don'ts**: https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html
+
+## Rules of Engagement
+
+1. **Verify before implementing** — RPC method names, params, and response fields change; check docs for the target Fiber node version.
+2. **Cross-reference showcase projects** — e.g. [Fiber Dashboard](https://www.fiber.world/showcase), [Fiber Studio](https://www.fiber.world/showcase) for operator-tool patterns relevant to FiberGuard.
+3. **Prefer official SDK** — wrap or extend `@ckb-ccc/fiber` in `packages/fiber-rpc` rather than reimplementing JSON-RPC from scratch unless there is a clear reason.
+4. **Cite sources** — when explaining protocol behavior to the user, link to the relevant doc section.
+5. **Debug with docs** — map raw RPC errors to documented failure modes (channels, payments, routing) before writing diagnostic copy.

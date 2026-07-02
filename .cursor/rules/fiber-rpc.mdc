@@ -1,0 +1,39 @@
+---
+description: Fiber and CKB RPC client conventions
+globs: "packages/{fiber-rpc,ckb-rpc,diagnostics}/**/*"
+alwaysApply: false
+---
+
+# RPC Client Rules
+
+## Fiber JSON-RPC
+
+- Default endpoint: `http://127.0.0.1:8227`
+- Single client class in `packages/fiber-rpc`; apps never call `fetch` directly
+- Every method: typed params, typed response, timeout, and structured error
+- Log request id + method on failure; never log secrets (macaroons, keys)
+
+```typescript
+// ✅ GOOD
+const channels = await fiberClient.listChannels();
+
+// ❌ BAD — raw fetch in a React component
+const res = await fetch('http://127.0.0.1:8227', { ... });
+```
+
+## CKB RPC
+
+- Testnet RPC lives in `packages/ckb-rpc`
+- Use for on-chain channel funding, UTXO, and confirmation context only
+- Keep chain queries separate from Fiber off-chain state
+
+## Diagnostics Package
+
+- `packages/diagnostics` consumes fiber-rpc + ckb-rpc; no UI dependencies
+- Failure reasons: map RPC/protocol errors → human-readable `Diagnostic` objects
+- "Can I Pay?" logic is pure functions where possible — easy to test and reuse in VS Code extension
+
+## Resilience
+
+- Retry only idempotent reads; never auto-retry payment sends
+- Handle node unreachable gracefully with actionable UI copy ("Is your Fiber node running on port 8227?")

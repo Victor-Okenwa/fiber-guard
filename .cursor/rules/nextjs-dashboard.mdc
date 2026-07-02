@@ -1,0 +1,32 @@
+---
+description: Next.js web dashboard conventions
+globs: "apps/web/**/*"
+alwaysApply: false
+---
+
+# Web Dashboard Rules
+
+## Stack
+
+- Next.js App Router, TypeScript, server components by default
+- Client components (`'use client'`) only when needed: interactivity, hooks, browser APIs
+- Styling: match whatever UI library is chosen; keep consistent tokens/spacing
+
+## Data Fetching
+
+- Server Components fetch via `packages/fiber-rpc` in Server Actions or route handlers
+- Do not expose raw node RPC to the browser — proxy through API routes
+- Poll/refetch for live metrics; show stale indicators when data is old
+
+## UX Priorities
+
+- Dashboard first: health summary above the fold
+- Every error state needs: what happened, why it matters, what to do next
+- Use loading skeletons, not spinners alone, for channel/peer lists
+- Format `bigint` balances with shared formatters from `packages/shared`
+
+## Components
+
+- Presentational vs container split where it aids clarity
+- Page-level layouts in `app/`; reusable UI in `components/`
+- No business logic in JSX — extract to hooks or `packages/diagnostics`

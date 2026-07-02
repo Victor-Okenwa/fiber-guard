@@ -1,0 +1,54 @@
+---
+description: FiberGuard coding conventions, architecture, and implementation rules
+alwaysApply: true
+---
+
+# FiberGuard Project Rules
+
+> **Product context** (problem, users, journeys, scope): see `fiberguard-context.mdc`.
+
+## What We Are Building
+
+FiberGuard is a diagnostics, monitoring, and reliability platform for **Fiber** nodes on Nervos CKB.
+
+**Fiber** is a Lightning-style payment channel network on CKB. Channels lock funds on-chain; payments settle off-chain. Multi-asset; aims to connect with Bitcoin Lightning.
+
+## Core Features (priority order)
+
+1. Web dashboard — node health, channels, liquidity, peers, route quality
+2. Payment failure diagnostics — plain-English explanations
+3. "Can I Pay?" checker — payment success probability
+4. Route simulation and testing tools
+5. Actionable recommendations (rebalance, peer issues, etc.)
+6. VS Code extension — interact with a local node from the editor
+
+## Monorepo Layout
+
+```
+apps/web/              # Next.js dashboard
+apps/vscode/           # VS Code extension
+packages/fiber-rpc/    # Shared Fiber JSON-RPC client
+packages/ckb-rpc/      # CKB testnet RPC client
+packages/diagnostics/  # Failure analysis, can-i-pay, routing logic
+packages/shared/       # Shared types, constants, utilities
+```
+
+## External Integrations
+
+- **Fiber node**: JSON-RPC at `http://127.0.0.1:8227` (default)
+- **CKB**: testnet RPC for on-chain context
+
+Put RPC clients in `packages/`, not duplicated in apps. Apps consume shared packages.
+
+## Code Principles
+
+- TypeScript everywhere; strict mode
+- Minimize scope — smallest correct diff; no unrelated changes
+- Match existing conventions before introducing new patterns
+- Comments only for non-obvious domain or protocol logic
+- User-facing copy must be clear English, not raw RPC errors
+- Prefer shared types for Fiber/CKB responses in `packages/shared`
+
+## Hackathon Goal
+
+Build something **useful**, **technically solid**, and **impressive** for "Gone in 60ms: Fiber Network Infrastructure Hackathon".
