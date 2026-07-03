@@ -26,5 +26,10 @@
   },
   "files": {
     "includes": ["**", "!**/dist", "!**/node_modules", "!**/.turbo", "!**/.next", "!**/*.vsix"]
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   }
 }

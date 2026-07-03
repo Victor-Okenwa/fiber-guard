@@ -68,12 +68,12 @@ Progress tracker only. Product context → [README.md](README.md). Coding conven
 
 ## Phase 3 — Web app scaffold (Day 5 morning)
 
-- [ ] Next.js App Router in `apps/web`
-- [ ] shadcn/ui init — components in `apps/web/components/ui/`
-- [ ] Install core shadcn components: `Card`, `Badge`, `Table`, `Tabs`, `Alert`, `Skeleton`, `Button`, `Input`, `Dialog`
-- [ ] App layout: sidebar nav (Dashboard, Channels, Peers, Payments, Can I Pay?)
-- [ ] `FIBER_RPC_URL` env var; never call Fiber RPC from browser directly
-- [ ] API route handlers (or Server Actions) proxying `@fiberguard/fiber-rpc`
+- [x] Next.js App Router in `apps/web`
+- [x] shadcn/ui init — components in `apps/web/components/ui/`
+- [x] Install core shadcn components: `Card`, `Badge`, `Table`, `Tabs`, `Alert`, `Skeleton`, `Button`, `Input`, `Dialog`
+- [x] App layout: sidebar nav (Dashboard, Channels, Peers, Payments, Can I Pay?)
+- [x] `FIBER_RPC_URL` env var; never call Fiber RPC from browser directly
+- [x] API route handlers (or Server Actions) proxying `@fiberguard/fiber-rpc`
 
 ---
 
