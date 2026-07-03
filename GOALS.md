@@ -14,27 +14,27 @@ Progress tracker only. Product context → [README.md](README.md). Coding conven
 - [x] Register on CKBoost (hackathon platform)
 - [x] Install Node.js ≥ 20, pnpm ≥ 9
 - [x] Install and start Fiber node (FNN) with JSON-RPC on `http://127.0.0.1:8227`
-- [ ] Verify node responds: `curl` or SDK `getNodeInfo()`
-- [ ] Ensure at least one channel in `ChannelReady` (or document demo setup script)
-- [ ] Optional: second node or test invoice for payment failure demos
+- [x] Verify node responds: `curl` or SDK `getNodeInfo()` — `./scripts/verify-node.sh` (v0.9.0-rc5, pubkey `02e87dde…`)
+- [x] Ensure at least one channel in `ChannelReady` (or document demo setup script) — see [docs/demo-setup.md](docs/demo-setup.md) (0 channels now; Options A/B to open)
+- [x] Optional: second node or test invoice for payment failure demos — steps in [docs/demo-setup.md](docs/demo-setup.md#optional--second-node-for-failure-demos)
 
 ---
 
 ## Phase 1 — Monorepo foundation (Day 1)
 
-- [ ] Root `package.json` with scripts: `dev`, `build`, `test`, `lint`, `typecheck`
-- [ ] `pnpm-workspace.yaml` (`apps/`*, `packages/*`)
-- [ ] `turbo.json` pipeline (`build`, `dev`, `test`, `lint`, `typecheck`)
-- [ ] Root `tsconfig.base.json` (strict mode)
-- [ ] ESLint + Prettier shared config
-- [ ] `.gitignore`, `.env.example`
-- [ ] Package stubs with `@fiberguard/*` naming:
-  - [ ] `packages/shared`
-  - [ ] `packages/fiber-rpc`
-  - [ ] `packages/diagnostics`
-  - [ ] `apps/web`
-  - [ ] `apps/vscode` (stub only — no work yet)
-- [ ] `pnpm install` and `pnpm build` succeed across workspace
+- [x] Root `package.json` with scripts: `dev`, `build`, `test`, `lint`, `typecheck`
+- [x] `pnpm-workspace.yaml` (`apps/*`, `packages/*`)
+- [x] `turbo.json` pipeline (`build`, `dev`, `test`, `lint`, `typecheck`)
+- [x] Root `tsconfig.base.json` (strict mode)
+- [x] Biome shared config (lint + format)
+- [x] `.gitignore`, `.env.example`
+- [x] Package stubs with `@fiberguard/*` naming:
+  - [x] `packages/shared`
+  - [x] `packages/fiber-rpc`
+  - [x] `packages/diagnostics`
+  - [x] `apps/web`
+  - [x] `apps/vscode` (stub only — no work yet)
+- [x] `pnpm install` and `pnpm build` succeed across workspace
 
 ---
 
@@ -42,27 +42,27 @@ Progress tracker only. Product context → [README.md](README.md). Coding conven
 
 ### `packages/shared`
 
-- [ ] `Diagnostic` type (`code`, `severity`, `title`, `explanation`, `remediation`, `context`)
-- [ ] Domain types: `ChannelInfo`, `PeerInfo`, `PaymentInfo`, `NodeHealth`
-- [ ] `bigint` amount formatters (no floating-point for balances)
-- [ ] Severity helpers / constants
+- [x] `Diagnostic` type (`code`, `severity`, `title`, `explanation`, `remediation`, `context`)
+- [x] Domain types: `ChannelInfo`, `PeerInfo`, `PaymentInfo`, `NodeHealth`
+- [x] `bigint` amount formatters (no floating-point for balances)
+- [x] Severity helpers / constants
 
 ### `packages/fiber-rpc`
 
-- [ ] Wrap `@ckb-ccc/fiber` `FiberSDK` (per `.cursor/rules/fiber-rpc.mdc`)
-- [ ] Typed methods: `getNodeInfo`, `listChannels`, `listPeers`, `parseInvoice`, `getPayment`
-- [ ] Structured `FiberRpcError` with method name + sanitized context
-- [ ] Configurable endpoint + timeout; default `http://127.0.0.1:8227`
-- [ ] Connectivity smoke test script or Vitest integration test
+- [x] Wrap `@ckb-ccc/fiber` `FiberSDK` (per `.cursor/rules/fiber-rpc.mdc`)
+- [x] Typed methods: `getNodeInfo`, `listChannels`, `listPeers`, `parseInvoice`, `getPayment`
+- [x] Structured `FiberRpcError` with method name + sanitized context
+- [x] Configurable endpoint + timeout; default `http://127.0.0.1:8227`
+- [x] Connectivity smoke test script or Vitest integration test (`FIBER_INTEGRATION=1`)
 
 ### `packages/diagnostics`
 
-- [ ] `assessNodeHealth(nodeInfo, channels, peers)` → health score + `Diagnostic[]`
-- [ ] `diagnosePaymentFailure(payment, channels?, peers?)` → `Diagnostic[]` from `failedError` patterns
-- [ ] `canIPay(invoice, channels, peers, nodeInfo)` → `{ probability, blockers: Diagnostic[] }`
-- [ ] `getRecommendations(health, channels, peers)` → rebalance / peer / capacity hints
-- [ ] Vitest unit tests with fixture RPC responses (no node required for CI)
-- [ ] At least one integration test against live node (documented, skippable in CI)
+- [x] `assessNodeHealth(nodeInfo, channels, peers)` → health score + `Diagnostic[]`
+- [x] `diagnosePaymentFailure(payment, channels?, peers?)` → `Diagnostic[]` from `failedError` patterns
+- [x] `canIPay(invoice, channels, peers, nodeInfo)` → `{ probability, blockers: Diagnostic[] }`
+- [x] `getRecommendations(health, channels, peers)` → rebalance / peer / capacity hints
+- [x] Vitest unit tests with fixture RPC responses (no node required for CI)
+- [x] At least one integration test against live node (documented, skippable in CI)
 
 ---
 

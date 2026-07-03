@@ -87,7 +87,7 @@ fibergaurd/
 └── README.md
 ```
 
-> **Status:** Early setup. Monorepo tooling and apps will be scaffolded in upcoming work.
+> **Status:** Phase 1 complete — pnpm + Turborepo monorepo with `@fiberguard/*` package stubs. Next: Phase 2 core packages.
 
 ---
 
@@ -106,13 +106,17 @@ Refer to the [Fiber documentation](https://github.com/nervosnetwork/fiber) for i
 http://127.0.0.1:8227
 ```
 
-Verify connectivity (example — exact method names may vary by Fiber version):
+Verify connectivity:
 
 ```bash
+./scripts/verify-node.sh
+# or manually:
 curl -X POST http://127.0.0.1:8227 \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","method":"node_info","params":[],"id":1}'
 ```
+
+For channel setup before payment demos, see [docs/demo-setup.md](docs/demo-setup.md).
 
 ---
 
@@ -136,6 +140,7 @@ pnpm test
 # Lint and typecheck
 pnpm lint
 pnpm typecheck
+pnpm format   # auto-fix with Biome
 ```
 
 ### Environment variables
@@ -202,9 +207,10 @@ Project-specific AI guidance lives in [`.cursor/rules/`](.cursor/rules/):
 
 ## Roadmap
 
-- [ ] Monorepo scaffold (pnpm workspaces, TypeScript, ESLint)
-- [ ] `packages/fiber-rpc` — typed client with core Fiber methods
-- [ ] `packages/shared` — domain types and formatters
+- [x] Monorepo scaffold (pnpm workspaces, TypeScript, Biome)
+- [x] `packages/shared` — domain types, formatters, diagnostic codes
+- [x] `packages/fiber-rpc` — typed client wrapping `@ckb-ccc/fiber`
+- [x] `packages/diagnostics` — health, payment failure, can-i-pay logic
 - [ ] Web dashboard — node health and channel overview
 - [ ] Payment failure diagnostics
 - [ ] "Can I Pay?" checker

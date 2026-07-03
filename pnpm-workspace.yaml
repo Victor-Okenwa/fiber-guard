@@ -1,0 +1,11 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+catalog:
+  typescript: "^5.8.3"
+  tsup: "^8.5.0"
+  vitest: "^3.2.4"
+  turbo: "^2.5.4"
+  "@biomejs/biome": "^2.0.0"
+  "@ckb-ccc/fiber": "^0.0.0-canary-20260505020844"
