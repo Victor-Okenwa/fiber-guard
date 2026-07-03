@@ -5,6 +5,8 @@
 
 Progress tracker only. Product context → [README.md](README.md). Coding conventions → `.cursor/rules/`.
 
+**Execution:** Every task maps to a Phase → section → checkbox here. Work phases **0 → 7** in order; confirm with the user before advancing phases. Decompose large items into ordered sub-steps ([decomposition guide](https://mathsgenie.co.uk/gcse/computer-science/edexcel/decomposition-and-abstraction-to-solve-problems/revision-guides)). See `.cursor/rules/goals-execution.mdc`.
+
 ---
 
 ## Phase 0 — Pre-flight (Day 1 morning)
@@ -21,7 +23,7 @@ Progress tracker only. Product context → [README.md](README.md). Coding conven
 ## Phase 1 — Monorepo foundation (Day 1)
 
 - [ ] Root `package.json` with scripts: `dev`, `build`, `test`, `lint`, `typecheck`
-- [ ] `pnpm-workspace.yaml` (`apps/*`, `packages/*`)
+- [ ] `pnpm-workspace.yaml` (`apps/`*, `packages/*`)
 - [ ] `turbo.json` pipeline (`build`, `dev`, `test`, `lint`, `typecheck`)
 - [ ] Root `tsconfig.base.json` (strict mode)
 - [ ] ESLint + Prettier shared config

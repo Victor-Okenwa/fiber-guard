@@ -1,0 +1,75 @@
+---
+description: Map every task to GOALS.md; execute phases hierarchically with decomposition
+alwaysApply: true
+---
+
+# Goals & Task Execution
+
+**Source of truth:** [GOALS.md](../../GOALS.md) at repo root.
+
+Every task must be tied to a **Phase → section → checkbox item** in `GOALS.md`. No orphan work.
+
+## Before Starting Any Task
+
+1. **Read `GOALS.md`** and identify the active phase (lowest incomplete phase).
+2. **Declare placement** at the start of work:
+   ```
+   Goal: Phase N — <phase title>
+   Step: <section or package name, if any>
+   Substep: <exact checkbox item from GOALS.md>
+   ```
+3. If the task does not map to an existing item, **propose a new substep** under the correct phase and add it to `GOALS.md` before coding.
+4. **Decompose** the substep into ordered micro-steps when it is non-trivial (see Decomposition below).
+
+## Hierarchical Execution (no skipping)
+
+| Rule | Behavior |
+|------|----------|
+| **Order** | Complete phases **0 → 7** in sequence. Within a phase, complete sections top-to-bottom. |
+| **Active phase** | Only work in the **current** incomplete phase unless the user explicitly redirects. |
+| **Phase complete** | When all checkboxes in a phase are done, **ask the user to confirm** before starting the next phase: *"Phase N is complete. Proceed to Phase N+1?"* |
+| **Substep complete** | Mark `[x]` in `GOALS.md` when a checkbox item is fully done and verified. |
+| **Skip** | Do **not** skip phases or substeps. If the user requests a skip: (1) state what is being skipped and why, (2) **ask for explicit confirmation**, (3) mark skipped items with `[~]` and a one-line reason in `GOALS.md`. |
+| **Jump ahead** | If the user asks to work on a later phase, confirm they accept leaving earlier items incomplete, then record the exception in `GOALS.md`. |
+
+## Decomposition & Sub-steps
+
+Break complex goals into **small, ordered, verifiable** substeps before implementation.
+
+Use **decomposition** (split large problems into independent parts) and **abstraction** (name each part by what it does, not how). Reference: [Decomposition and abstraction (Maths Genie)](https://mathsgenie.co.uk/gcse/computer-science/edexcel/decomposition-and-abstraction-to-solve-problems/revision-guides).
+
+When taking on a goal, output a short plan:
+
+```
+Phase 2 / packages/fiber-rpc / Wrap FiberSDK
+├── 2.1 Add dependency + export FiberClient class
+├── 2.2 Implement getNodeInfo, listChannels, listPeers
+├── 2.3 Add FiberRpcError + timeout config
+└── 2.4 Smoke test against :8227
+```
+
+Rules for sub-steps:
+
+- Each sub-step should be **completable in one focused session** and **testable** on its own.
+- Sub-steps are **sequential** unless explicitly parallel-safe (e.g. independent package stubs).
+- Add ephemeral sub-steps inline in chat; add **persistent** new checkboxes to `GOALS.md` if they represent real deliverables.
+- Do not start sub-step 2.3 until 2.2 is done or user confirms skip.
+
+## During & After Work
+
+- **Scope:** Changes must advance the declared substep only — no drive-by refactors.
+- **Status updates:** End significant work with goal placement + what was checked off.
+- **Blockers:** If blocked on a substep, report it against the `GOALS.md` item and propose decomposition or a prerequisite substep — do not silently switch goals.
+
+## Quick Reference — Phase Map
+
+| Phase | Focus |
+|-------|--------|
+| 0 | Pre-flight (node, CKBoost, env) |
+| 1 | Monorepo foundation |
+| 2 | Core packages (shared, fiber-rpc, diagnostics) |
+| 3 | Web app scaffold |
+| 4 | Web dashboard features |
+| 5 | VS Code extension |
+| 6 | Integration and hardening |
+| 7 | Hackathon submission |

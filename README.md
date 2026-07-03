@@ -191,6 +191,7 @@ Project-specific AI guidance lives in [`.cursor/rules/`](.cursor/rules/):
 |------|-------|
 | `fiberguard-context.mdc` | Product problem, solution, users, journeys, scope (always on) |
 | `fiberguard-project.mdc` | Architecture, monorepo layout, coding principles (always on) |
+| `goals-execution.mdc` | Map tasks to [GOALS.md](GOALS.md); hierarchical phases, decomposition (always on) |
 | `documentation-references.mdc` | Official docs to consult for tasks, debugging, questions (always on) |
 | `typescript-standards.mdc` | TypeScript best practices |
 | `fiber-rpc.mdc` | RPC client and diagnostics conventions |
