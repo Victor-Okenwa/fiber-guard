@@ -19,6 +19,7 @@ Use `WebFetch`, `WebSearch`, or uploaded docs before writing code or giving defi
 | UI/UX patterns, similar tools, hackathon inspiration | Browse [Fiber Showcase](https://www.fiber.world/showcase) |
 | TypeScript style, types, declarations | Read [W3Schools TS Best Practices](https://www.w3schools.com/typescript/typescript_best_practices.php) and [TS Handbook: Do's and Don'ts](https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html) |
 | Unclear errors, version mismatches, edge cases | Search Fiber docs FAQ/Troubleshooting sections before improvising fixes |
+| Groq API integration, chat completions, models, structured output | Read [Groq Overview](https://console.groq.com/docs/overview) and [Chat Completions API](https://console.groq.com/docs/api-reference#chat-create) |
 | Hackathon scope, category fit, submission requirements | Read [Gone in 60ms announcement](https://talk.nervos.org/t/gone-in-60ms-fiber-network-infrastructure-hackathon-announcement/10418) and CKBoost campaign rules |
 | Task planning, phase order, what to build next | Read [GOALS.md](../../GOALS.md) — follow `goals-execution.mdc` |
 | Breaking a complex goal into sub-steps | Apply decomposition ([Maths Genie guide](https://mathsgenie.co.uk/gcse/computer-science/edexcel/decomposition-and-abstraction-to-solve-problems/revision-guides)) |
@@ -34,6 +35,20 @@ Use `WebFetch`, `WebSearch`, or uploaded docs before writing code or giving defi
 - **TypeScript declaration do's/don'ts**: https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html
 - **Hackathon announcement & rules**: https://talk.nervos.org/t/gone-in-60ms-fiber-network-infrastructure-hackathon-announcement/10418
 - **VS Code Extension API**: https://code.visualstudio.com/api
+- **Groq Overview**: https://console.groq.com/docs/overview
+- **Groq API Reference (Chat Create)**: https://console.groq.com/docs/api-reference#chat-create
+
+## Groq AI (explanations)
+
+When integrating Groq for on-demand diagnostic explanations in `apps/web`:
+
+1. **Consult official docs first** — [Overview](https://console.groq.com/docs/overview), [Chat Completions](https://console.groq.com/docs/api-reference#chat-create)
+2. **Server-only** — `GROQ_API_KEY` never exposed to the browser; calls from API routes only
+3. **Endpoint** — `POST https://api.groq.com/openai/v1/chat/completions` with `messages` + `model`
+4. **OpenAI-compatible client** — `baseURL: https://api.groq.com/openai/v1` if using the OpenAI SDK
+5. **Deterministic first** — pass existing `Diagnostic` as context; Groq augments, does not replace `@fiberguard/diagnostics` rules
+6. **Graceful fallback** — if key missing or Groq errors, show static `Diagnostic.explanation`
+7. **No secrets in logs** — never log API keys
 
 ## Rules of Engagement
 

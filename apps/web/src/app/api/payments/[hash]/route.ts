@@ -1,5 +1,7 @@
+import { diagnosePaymentFailure } from '@fiberguard/diagnostics';
 import { handleApiError } from '@/lib/api-error';
 import { getFiberClient } from '@/lib/fiber';
+import { fetchNodeSnapshot } from '@/lib/fiber-data';
 import { jsonResponse } from '@/lib/json';
 
 export async function GET(_request: Request, context: { params: Promise<{ hash: string }> }) {
@@ -11,7 +13,14 @@ export async function GET(_request: Request, context: { params: Promise<{ hash: 
 
     const client = getFiberClient();
     const payment = await client.getPayment(hash);
-    return jsonResponse(payment);
+
+    let diagnostics: ReturnType<typeof diagnosePaymentFailure> = [];
+    if (payment.status === 'Failed') {
+      const { channels, peers } = await fetchNodeSnapshot();
+      diagnostics = diagnosePaymentFailure(payment, channels, peers);
+    }
+
+    return jsonResponse({ payment, diagnostics });
   } catch (error) {
     return handleApiError(error);
   }

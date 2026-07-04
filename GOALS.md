@@ -81,40 +81,40 @@ Progress tracker only. Product context → [README.md](README.md). Coding conven
 
 ### Dashboard (health at a glance)
 
-- [ ] Health summary card: green/yellow/red from `assessNodeHealth`
-- [ ] Node info: version, pubkey, peer count, channel count
-- [ ] Top diagnostics + recommendations panel
-- [ ] Node unreachable state: actionable copy ("Is your Fiber node running on port 8227?")
+- [x] Health summary card: green/yellow/red from `assessNodeHealth`
+- [x] Node info: version, pubkey, peer count, channel count
+- [x] Top diagnostics + recommendations panel
+- [x] Node unreachable state: actionable copy ("Is your Fiber node running on port 8227?")
 
 ### Channels
 
-- [ ] Channel table: ID, state, local/remote balance, capacity
-- [ ] Liquidity bar or ratio per channel
-- [ ] Highlight non-`ChannelReady` channels with warning badges
+- [x] Channel table: ID, state, local/remote balance, capacity
+- [x] Liquidity bar or ratio per channel
+- [x] Highlight non-`ChannelReady` channels with warning badges
 
 ### Peers
 
-- [ ] Peer list with connection status
-- [ ] Empty peer state with remediation hint
+- [x] Peer list with connection status
+- [x] Empty peer state with remediation hint
 
 ### Payments + diagnostics (differentiator)
 
-- [ ] Payment list (recent; status badges)
-- [ ] Payment detail view with `diagnosePaymentFailure` output
-- [ ] Never show raw `failedError` alone — always paired with `Diagnostic`
+- [x] Payment list (recent; status badges)
+- [x] Payment detail view with `diagnosePaymentFailure` output
+- [x] Never show raw `failedError` alone — always paired with `Diagnostic`
 
 ### Can I Pay? (differentiator)
 
-- [ ] Input for invoice string
-- [ ] `parseInvoice` preview (amount, currency, description)
-- [ ] Success probability + blocker list from `canIPay`
-- [ ] Clear CTA copy: what to fix before `sendPayment`
+- [x] Input for invoice string
+- [x] `parseInvoice` preview (amount, currency, description)
+- [x] Success probability + blocker list from `canIPay`
+- [x] Clear CTA copy: what to fix before `sendPayment`
 
 ### UX polish
 
-- [ ] Loading skeletons on lists
-- [ ] Stale-data indicator if poll interval exceeded
-- [ ] Responsive layout; dashboard readable in < 10 seconds
+- [x] Loading skeletons on lists
+- [x] Stale-data indicator if poll interval exceeded
+- [x] Responsive layout; dashboard readable in < 10 seconds
 
 ---
 

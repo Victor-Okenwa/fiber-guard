@@ -2,6 +2,11 @@ import { FiberSDK } from '@ckb-ccc/fiber';
 import type { ChannelInfo, ParsedInvoice, PaymentInfo, PeerInfo } from '@fiberguard/shared';
 import { DEFAULT_FIBER_RPC_URL } from './constants.js';
 import { wrapRpcCall } from './errors.js';
+import type {
+  FiberListPaymentsResponse,
+  ListPaymentsParams,
+  ListPaymentsResult,
+} from './list-payments.js';
 import { mapChannel, mapNodeInfo, mapParsedInvoice, mapPayment, mapPeer } from './mappers.js';
 
 export interface FiberClientConfig {
@@ -24,6 +29,7 @@ export interface FiberClient {
   listPeers(): Promise<PeerInfo[]>;
   parseInvoice(invoice: string): Promise<ParsedInvoice>;
   getPayment(paymentHash: string): Promise<PaymentInfo>;
+  listPayments(params?: ListPaymentsParams): Promise<ListPaymentsResult>;
 }
 
 export function createFiberClient(config: FiberClientConfig = {}): FiberClient {
@@ -65,6 +71,21 @@ export function createFiberClient(config: FiberClientConfig = {}): FiberClient {
       return wrapRpcCall('getPayment', endpoint, async () => {
         const payment = await sdk.getPayment({ paymentHash });
         return mapPayment(payment);
+      });
+    },
+
+    listPayments(params: ListPaymentsParams = {}) {
+      return wrapRpcCall('listPayments', endpoint, async () => {
+        const rpcParams: Record<string, unknown> = {};
+        if (params.status !== undefined) rpcParams.status = params.status;
+        if (params.limit !== undefined) rpcParams.limit = params.limit;
+        if (params.after !== undefined) rpcParams.after = params.after;
+
+        const result = await sdk.rpc.call<FiberListPaymentsResponse>('list_payments', [rpcParams]);
+        return {
+          payments: result.payments.map(mapPayment),
+          lastCursor: result.last_cursor ? String(result.last_cursor) : undefined,
+        };
       });
     },
   };
