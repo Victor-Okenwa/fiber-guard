@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "pnpm@10.18.3",
   "scripts": {
-    "dev": "turbo watch build",
+    "dev": "turbo dev",
     "dev:watch": "turbo run dev --log-order=grouped --ui=tui",
     "dev:shared": "turbo run dev --filter=@fiberguard/shared",
     "dev:fiber-rpc": "turbo run dev --filter=@fiberguard/fiber-rpc",

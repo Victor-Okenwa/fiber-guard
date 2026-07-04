@@ -1,7 +1,8 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 import { buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,16 +12,30 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
+function ThemeIcon({ theme }: { theme: string | undefined }) {
+  if (theme === 'system') {
+    return <Monitor className="h-[1.2rem] w-[1.2rem]" />;
+  }
+  if (theme === 'dark') {
+    return <Moon className="h-[1.2rem] w-[1.2rem]" />;
+  }
+  return <Sun className="h-[1.2rem] w-[1.2rem]" />;
+}
+
 export function ModeToggle() {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'relative')}
       >
-        <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-        <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+        {mounted ? <ThemeIcon theme={theme} /> : <Monitor className="h-[1.2rem] w-[1.2rem]" />}
         <span className="sr-only">Toggle theme</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
