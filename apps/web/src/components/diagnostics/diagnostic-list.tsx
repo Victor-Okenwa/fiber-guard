@@ -19,7 +19,7 @@ export function DiagnosticList({
   const items = limit ? diagnostics.slice(0, limit) : diagnostics;
 
   return (
-    <div className="space-y-3">
+    <div className="min-w-0 space-y-3">
       {title && <h3 className="text-sm font-medium">{title}</h3>}
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground">{emptyMessage}</p>

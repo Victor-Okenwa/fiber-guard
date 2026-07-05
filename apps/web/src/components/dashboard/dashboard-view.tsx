@@ -23,6 +23,7 @@ export function DashboardView() {
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Node health and diagnostics at a glance.</p>
         </div>
+
         <StaleIndicator lastFetchedAt={lastFetchedAt} intervalMs={POLL_MS} />
       </div>
 

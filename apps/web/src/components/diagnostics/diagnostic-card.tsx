@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { MarkdownContent } from '@/components/ui/markdown-content';
 import { fetchExplain } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 
@@ -38,27 +39,34 @@ export function DiagnosticCard({ diagnostic, context }: DiagnosticCardProps) {
   }
 
   return (
-    <Alert>
-      <div className="flex items-start justify-between gap-2">
-        <AlertTitle className="flex items-center gap-2">
+    <Alert className="min-w-0 overflow-hidden">
+      <div className="flex min-w-0 items-start justify-between gap-2">
+        <AlertTitle className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
           {diagnostic.title}
           <Badge className={cn('text-xs', severityVariant[diagnostic.severity])}>
             {diagnostic.severity}
           </Badge>
         </AlertTitle>
         <Button
+          className="shrink-0"
           variant="outline"
           size="xs"
           onClick={() => void handleExplain()}
           disabled={isExplaining}
         >
-          {isExplaining ? 'Explaining…' : 'Explain'}
+          {isExplaining ? 'Thinking…' : 'Explain'}
         </Button>
       </div>
-      <AlertDescription className="mt-2 space-y-2">
-        <p>{displayExplanation}</p>
-        {diagnostic.remediation && (
-          <p className="text-sm text-muted-foreground">
+      <AlertDescription className="mt-2 min-w-0 space-y-2">
+        {aiExplanation ? (
+          <MarkdownContent content={aiExplanation} />
+        ) : (
+          <p className="min-w-0 wrap-anywhere leading-relaxed">
+            {displayExplanation}
+          </p>
+        )}
+        {diagnostic.remediation && !aiExplanation && (
+          <p className="min-w-0 wrap-anywhere text-sm text-muted-foreground">
             <span className="font-medium">Fix:</span> {diagnostic.remediation}
           </p>
         )}
