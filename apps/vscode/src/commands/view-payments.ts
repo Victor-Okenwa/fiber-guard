@@ -11,20 +11,33 @@ function escapeHtml(value: string): string {
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function renderCopyButton(value: string, label: string): string {
+  return `<button type="button" class="copy-btn" title="Copy ${escapeHtml(label)}" aria-label="Copy ${escapeHtml(label)}" data-copy="${escapeHtml(value)}">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M4 2h8a1 1 0 0 1 1 1v8h-1V3H4V2zm-1 2h7a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm0 1v8h7V5H3z"/>
+    </svg>
+  </button>`;
 }
 
 function renderPaymentsTable(payments: PaymentInfo[]): string {
   const rows = payments
     .map((payment) => {
-      const hash = escapeHtml(payment.paymentHash);
+      const hash = payment.paymentHash;
+      const hashEscaped = escapeHtml(hash);
       const statusLabel = escapeHtml(payment.status);
       const statusClass = payment.status.toLowerCase();
       const amount = escapeHtml(formatPaymentAmount(payment.amount));
       const fee = escapeHtml(formatCkbFromShannons(payment.fee));
       const updated = escapeHtml(formatPaymentTimestamp(payment.lastUpdatedAt));
       return `<tr>
-        <td class="mono" title="${hash}">${escapeHtml(truncateMiddle(payment.paymentHash, 12, 6))}</td>
+        <td class="mono hash-cell">
+          <span class="hash-text" title="${hashEscaped}">${escapeHtml(truncateMiddle(hash, 12, 6))}</span>
+          ${renderCopyButton(hash, 'payment hash')}
+        </td>
         <td><span class="status status-${statusClass}">${statusLabel}</span></td>
         <td class="mono num">${amount}</td>
         <td class="mono num">${fee}</td>
@@ -73,6 +86,32 @@ function renderPaymentsTable(payments: PaymentInfo[]): string {
     .mono { font-family: var(--vscode-editor-font-family); }
     .num { text-align: right; font-variant-numeric: tabular-nums; }
     .muted { color: var(--vscode-descriptionForeground); white-space: nowrap; }
+    .hash-cell {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+    .hash-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .copy-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--vscode-descriptionForeground);
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background: var(--vscode-toolbar-hoverBackground);
+      color: var(--vscode-foreground);
+    }
+    .copy-btn.copied { color: var(--vscode-charts-green); }
     .status {
       display: inline-block;
       padding: 2px 8px;
@@ -84,6 +123,20 @@ function renderPaymentsTable(payments: PaymentInfo[]): string {
     .status-failed { background: color-mix(in srgb, var(--vscode-errorForeground) 15%, transparent); color: var(--vscode-errorForeground); }
     .status-inflight, .status-created { background: var(--vscode-badge-background); color: var(--vscode-badge-foreground); }
     .hint { margin-top: 12px; color: var(--vscode-descriptionForeground); font-size: 0.9rem; }
+    #toast {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: var(--vscode-notifications-background);
+      color: var(--vscode-notifications-foreground);
+      border: 1px solid var(--vscode-panel-border);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    #toast.visible { opacity: 1; }
   </style>
 </head>
 <body>
@@ -103,6 +156,30 @@ function renderPaymentsTable(payments: PaymentInfo[]): string {
     </tbody>
   </table>
   <p class="hint">Use <strong>FiberGuard: Diagnose Payment</strong> with a payment hash for failure diagnostics.</p>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const vscodeApi = acquireVsCodeApi();
+    const toast = document.getElementById('toast');
+    let toastTimer;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('visible'), 1500);
+    }
+
+    document.querySelectorAll('.copy-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        const value = button.getAttribute('data-copy');
+        if (!value) return;
+        vscodeApi.postMessage({ type: 'copy', value });
+        button.classList.add('copied');
+        setTimeout(() => button.classList.remove('copied'), 1500);
+        showToast('Copied to clipboard');
+      });
+    });
+  </script>
 </body>
 </html>`;
 }
@@ -126,9 +203,14 @@ export async function viewPaymentsCommand(channel: vscode.OutputChannel): Promis
       'fiberguardPayments',
       'FiberGuard Payments',
       vscode.ViewColumn.Active,
-      { enableScripts: false, retainContextWhenHidden: true },
+      { enableScripts: true, retainContextWhenHidden: true },
     );
     panel.webview.html = renderPaymentsTable(result.payments);
+    panel.webview.onDidReceiveMessage((message: { type?: string; value?: string }) => {
+      if (message.type === 'copy' && message.value) {
+        void vscode.env.clipboard.writeText(message.value);
+      }
+    });
   } catch (error) {
     reportError(channel, error);
   }

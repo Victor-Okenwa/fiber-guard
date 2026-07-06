@@ -1,5 +1,6 @@
 'use client';
 
+import { CopyableText, CopyableTruncatedText } from '@/components/data/copyable-text';
 import { StaleIndicator } from '@/components/data/stale-indicator';
 import { TableSkeleton } from '@/components/data/table-skeleton';
 import { NodeUnreachableAlert } from '@/components/node/node-unreachable-alert';
@@ -16,10 +17,6 @@ import { usePoll } from '@/hooks/use-poll';
 import { fetchPeers } from '@/lib/api-client';
 
 const POLL_MS = 15_000;
-
-function truncateKey(value: string): string {
-  return value.length > 16 ? `${value.slice(0, 8)}…${value.slice(-6)}` : value;
-}
 
 export function PeersView() {
   const { data, error, isLoading, lastFetchedAt } = usePoll(fetchPeers, {
@@ -59,10 +56,12 @@ export function PeersView() {
             <TableBody>
               {data.map((peer) => (
                 <TableRow key={peer.pubkey}>
-                  <TableCell className="font-mono text-xs" title={peer.pubkey}>
-                    {truncateKey(peer.pubkey)}
+                  <TableCell className="text-xs">
+                    <CopyableTruncatedText value={peer.pubkey} head={8} tail={6} />
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{peer.address}</TableCell>
+                  <TableCell className="max-w-xs text-xs">
+                    <CopyableText value={peer.address} />
+                  </TableCell>
                   <TableCell>
                     <Badge>Connected</Badge>
                   </TableCell>

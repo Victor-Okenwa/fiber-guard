@@ -53,6 +53,11 @@ const ACTIONS: ActionDefinition[] = [
 ];
 
 export class FiberTreeItem extends vscode.TreeItem {
+  /** Full value copied by the inline copy action. */
+  copyValue?: string;
+  /** Optional second copy target (e.g. peer address). */
+  secondaryCopyValue?: string;
+
   constructor(
     readonly kind: NodeKind,
     label: string,
@@ -162,6 +167,8 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
         ready ? 'pass' : 'warning',
         ready ? undefined : new vscode.ThemeColor('list.warningForeground'),
       );
+      item.contextValue = 'copyableChannel';
+      item.copyValue = channel.channelId;
       item.tooltip = [
         `Channel ${channel.channelId}`,
         `State: ${channel.stateName}${channel.enabled ? '' : ' (disabled)'}`,
@@ -189,6 +196,9 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
       );
       item.description = peer.address;
       item.iconPath = new vscode.ThemeIcon('vm-connect');
+      item.contextValue = 'copyablePeer';
+      item.copyValue = peer.pubkey;
+      item.secondaryCopyValue = peer.address;
       const tooltip = new vscode.MarkdownString(
         [
           '**Peer connection**',

@@ -2,6 +2,7 @@
 
 import { formatCkbFromShannons, parseHexAmount } from '@fiberguard/shared';
 import { LiquidityBar } from '@/components/channels/liquidity-bar';
+import { CopyableTruncatedText } from '@/components/data/copyable-text';
 import { StaleIndicator } from '@/components/data/stale-indicator';
 import { TableSkeleton } from '@/components/data/table-skeleton';
 import { NodeUnreachableAlert } from '@/components/node/node-unreachable-alert';
@@ -18,10 +19,6 @@ import { usePoll } from '@/hooks/use-poll';
 import { fetchChannels } from '@/lib/api-client';
 
 const POLL_MS = 15_000;
-
-function truncateId(id: string): string {
-  return id.length > 14 ? `${id.slice(0, 8)}…${id.slice(-4)}` : id;
-}
 
 export function ChannelsView() {
   const { data, error, isLoading, lastFetchedAt } = usePoll(fetchChannels, {
@@ -66,8 +63,8 @@ export function ChannelsView() {
                 const notReady = ch.stateName !== 'ChannelReady';
                 return (
                   <TableRow key={ch.channelId}>
-                    <TableCell className="font-mono text-xs" title={ch.channelId}>
-                      {truncateId(ch.channelId)}
+                    <TableCell className="text-xs">
+                      <CopyableTruncatedText value={ch.channelId} head={8} tail={4} />
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">

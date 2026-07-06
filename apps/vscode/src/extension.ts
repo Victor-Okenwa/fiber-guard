@@ -3,7 +3,8 @@ import { canIPayCommand } from './commands/can-i-pay.js';
 import { diagnosePaymentCommand } from './commands/diagnose-payment.js';
 import { nodeStatusCommand } from './commands/node-status.js';
 import { viewPaymentsCommand } from './commands/view-payments.js';
-import { FiberTreeProvider } from './tree/provider.js';
+import { copyToClipboard } from './lib/copy.js';
+import { type FiberTreeItem, FiberTreeProvider } from './tree/provider.js';
 
 export function activate(context: vscode.ExtensionContext): void {
   const outputChannel = vscode.window.createOutputChannel('FiberGuard');
@@ -23,6 +24,12 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('fiberguard.viewPayments', () =>
       viewPaymentsCommand(outputChannel),
     ),
+    vscode.commands.registerCommand('fiberguard.copyValue', (item: FiberTreeItem) => {
+      if (item?.copyValue) void copyToClipboard(item.copyValue, 'Value');
+    }),
+    vscode.commands.registerCommand('fiberguard.copyPeerAddress', (item: FiberTreeItem) => {
+      if (item?.secondaryCopyValue) void copyToClipboard(item.secondaryCopyValue, 'Address');
+    }),
     vscode.workspace.onDidChangeConfiguration((event) => {
       if (event.affectsConfiguration('fiberguard.nodeUrl')) {
         treeProvider.refresh();

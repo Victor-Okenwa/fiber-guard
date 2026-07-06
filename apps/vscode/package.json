@@ -59,6 +59,16 @@
         "category": "FiberGuard",
         "title": "Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "fiberguard.copyValue",
+        "title": "Copy",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "fiberguard.copyPeerAddress",
+        "title": "Copy Address",
+        "icon": "$(copy)"
       }
     ],
     "viewsContainers": {
@@ -105,6 +115,23 @@
           "command": "fiberguard.refresh",
           "when": "view == fiberguard.explorer",
           "group": "navigation@5"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "fiberguard.copyValue",
+          "when": "view == fiberguard.explorer && viewItem == copyableChannel",
+          "group": "inline@1"
+        },
+        {
+          "command": "fiberguard.copyValue",
+          "when": "view == fiberguard.explorer && viewItem == copyablePeer",
+          "group": "inline@1"
+        },
+        {
+          "command": "fiberguard.copyPeerAddress",
+          "when": "view == fiberguard.explorer && viewItem == copyablePeer",
+          "group": "inline@2"
         }
       ]
     }

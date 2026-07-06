@@ -2,6 +2,7 @@
 
 import { formatCkbFromShannons, parseHexAmount } from '@fiberguard/shared';
 import { useState } from 'react';
+import { CopyableTruncatedText } from '@/components/data/copyable-text';
 import { StaleIndicator } from '@/components/data/stale-indicator';
 import { TableSkeleton } from '@/components/data/table-skeleton';
 import { DiagnosticList } from '@/components/diagnostics/diagnostic-list';
@@ -28,12 +29,8 @@ import { fetchPaymentDetail, fetchPayments } from '@/lib/api-client';
 
 const POLL_MS = 30_000;
 
-function truncateHash(hash: string): string {
-  return hash.length > 14 ? `${hash.slice(0, 10)}…${hash.slice(-4)}` : hash;
-}
-
 function formatPaymentAmount(amount: bigint | undefined): string {
-  if (amount === undefined || amount === 0n) return '—';
+  if (amount === undefined || amount === BigInt(0)) return '—';
   return formatCkbFromShannons(amount);
 }
 
@@ -114,8 +111,13 @@ export function PaymentsView() {
                   className="cursor-pointer"
                   onClick={() => void openDetail(payment.paymentHash)}
                 >
-                  <TableCell className="font-mono text-xs" title={payment.paymentHash}>
-                    {truncateHash(payment.paymentHash)}
+                  <TableCell className="text-xs">
+                    <CopyableTruncatedText
+                      value={payment.paymentHash}
+                      head={10}
+                      tail={4}
+                      stopPropagation
+                    />
                   </TableCell>
                   <TableCell>
                     <PaymentStatusBadge status={payment.status} />
@@ -145,7 +147,14 @@ export function PaymentsView() {
           <DialogHeader>
             <DialogTitle>Payment detail</DialogTitle>
             <DialogDescription className="font-mono text-xs break-all">
-              {selectedHash}
+              {selectedHash && (
+                <CopyableTruncatedText
+                  value={selectedHash}
+                  head={16}
+                  tail={8}
+                  className="text-xs"
+                />
+              )}
             </DialogDescription>
           </DialogHeader>
 

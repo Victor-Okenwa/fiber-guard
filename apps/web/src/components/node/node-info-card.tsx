@@ -1,9 +1,7 @@
-import type { FiberNodeSummary } from '@fiberguard/fiber-rpc';
+'use client';
 
-function truncateKey(value: string, head = 8, tail = 6): string {
-  if (value.length <= head + tail + 3) return value;
-  return `${value.slice(0, head)}…${value.slice(-tail)}`;
-}
+import type { FiberNodeSummary } from '@fiberguard/fiber-rpc';
+import { CopyableTruncatedText } from '@/components/data/copyable-text';
 
 interface NodeInfoCardProps {
   node: FiberNodeSummary;
@@ -20,8 +18,8 @@ export function NodeInfoCard({ node }: NodeInfoCardProps) {
         </div>
         <div className="flex justify-between gap-4">
           <dt className="text-muted-foreground">Pubkey</dt>
-          <dd className="font-mono text-xs" title={node.pubkey}>
-            {truncateKey(node.pubkey)}
+          <dd>
+            <CopyableTruncatedText value={node.pubkey} head={8} tail={6} className="text-xs" />
           </dd>
         </div>
         <div className="flex justify-between gap-4">
