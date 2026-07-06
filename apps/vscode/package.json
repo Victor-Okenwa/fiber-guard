@@ -3,6 +3,7 @@
   "displayName": "FiberGuard",
   "description": "Fiber node diagnostics in VS Code: health, channels, peers, payment failure analysis, and can-i-pay checks.",
   "version": "0.0.1",
+  "license": "MIT",
   "publisher": "fiberguard",
   "type": "module",
   "main": "./dist/extension.cjs",

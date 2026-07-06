@@ -1,6 +1,7 @@
 {
   "name": "fiberguard",
   "private": true,
+  "license": "MIT",
   "packageManager": "pnpm@10.18.3",
   "scripts": {
     "dev": "turbo dev",

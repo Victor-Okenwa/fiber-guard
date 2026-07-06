@@ -9,6 +9,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 - Added `CHANGELOG.md` to track extension release history and user-facing updates.
+- Added `LICENSE` (MIT) for marketplace packaging and Open VSX distribution.
 
 ## [0.0.1] - 2026-07-06
 

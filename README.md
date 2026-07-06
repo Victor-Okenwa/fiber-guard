@@ -280,7 +280,7 @@ Project-specific AI guidance lives in [`.cursor/rules/`](.cursor/rules/):
 
 ## License
 
-TBD
+[MIT](LICENSE)
 
 ---
 

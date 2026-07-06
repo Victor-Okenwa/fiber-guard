@@ -155,6 +155,6 @@ Progress tracker only. Product context → [README.md](README.md). Coding conven
 - [x] Technical breakdown (architecture diagram, package responsibilities)
 - [x] Fiber infrastructure gap explanation (why FiberGuard vs Dashboard/Studio)
 - [x] Future roadmap section
-- [ ] License chosen (e.g. MIT)
+- [x] License chosen (MIT — see [LICENSE](LICENSE))
 - [ ] CKBoost submission form completed
 - [ ] AI allowance claim filed if applicable ($20 rebate)
