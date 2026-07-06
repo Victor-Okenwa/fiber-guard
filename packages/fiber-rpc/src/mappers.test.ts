@@ -48,4 +48,16 @@ describe('mappers', () => {
     expect(payment.status).toBe('Failed');
     expect(payment.failedError).toBe('route not found');
   });
+
+  it('derives amount from router first hop', () => {
+    const payment = mapPayment({
+      paymentHash: '0xabc',
+      status: 'Success',
+      createdAt: '0x1',
+      lastUpdatedAt: '0x2',
+      fee: '0x0',
+      router: [{ pubkey: '02aa', amount: '0x2540be400', channelOutpoint: '0x1:0x0' }],
+    });
+    expect(payment.amount).toBe(10_000_000_000n);
+  });
 });

@@ -155,9 +155,14 @@ Copy `.env.example` to `.env.local` in `apps/web` once available.
 ### VS Code extension
 
 ```bash
-# Build and launch extension dev host
-pnpm --filter @fiberguard/vscode dev
+# Bundle the extension (esbuild)
+pnpm --filter fiberguard-vscode build
+
+# Or watch mode during development
+pnpm --filter fiberguard-vscode dev
 ```
+
+Then press **F5** in VS Code (launch config "Run FiberGuard Extension") to open an Extension Development Host with FiberGuard loaded. The activity bar shows a **FiberGuard** view (channels + peers), and the Command Palette exposes `FiberGuard: Node Status`, `FiberGuard: Can I Pay?`, and `FiberGuard: Diagnose Payment`.
 
 Extension setting: `fiberguard.nodeUrl` — Fiber RPC URL (default `http://127.0.0.1:8227`).
 

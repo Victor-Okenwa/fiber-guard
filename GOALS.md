@@ -120,17 +120,17 @@ Progress tracker only. Product context → [README.md](README.md). Coding conven
 
 ## Phase 5 — VS Code extension (Days 9–10)
 
-- [ ] Extension scaffold: `package.json` manifest, esbuild bundle, `pnpm --filter @fiberguard/vscode dev`
-- [ ] Setting: `fiberguard.nodeUrl` (default `http://127.0.0.1:8227`)
-- [ ] Activity bar icon + sidebar tree view (channels / peers)
-- [ ] Commands:
-  - [ ] `FiberGuard: Node Status`
-  - [ ] `FiberGuard: Can I Pay?` (input box for invoice)
-  - [ ] `FiberGuard: Diagnose Payment` (payment hash input)
-- [ ] Output channel `FiberGuard` for diagnostic text (same copy as web)
-- [ ] `showErrorMessage` / progress for long RPC calls
-- [ ] Reuse `@fiberguard/diagnostics` — no duplicated analysis logic
-- [ ] Native VS Code UI only (Codicons, theme colors — no shadcn)
+- [x] Extension scaffold: `package.json` manifest, esbuild bundle, `pnpm --filter fiberguard-vscode dev` (package renamed — VS Code manifests cannot use scoped names)
+- [x] Setting: `fiberguard.nodeUrl` (default `http://127.0.0.1:8227`)
+- [x] Activity bar icon + sidebar tree view (channels / peers)
+- [x] Commands:
+  - [x] `FiberGuard: Node Status`
+  - [x] `FiberGuard: Can I Pay?` (input box for invoice)
+  - [x] `FiberGuard: Diagnose Payment` (payment hash input)
+- [x] Output channel `FiberGuard` for diagnostic text (same copy as web)
+- [x] `showErrorMessage` / progress for long RPC calls
+- [x] Reuse `@fiberguard/diagnostics` — no duplicated analysis logic
+- [x] Native VS Code UI only (Codicons, theme colors — no shadcn)
 
 ---
 

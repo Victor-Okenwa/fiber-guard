@@ -12,6 +12,8 @@ Shared dependency versions are defined once in [`pnpm-workspace.yaml`](../pnpm-w
 | `turbo` | `^2.5.4` | Monorepo task orchestration |
 | `@biomejs/biome` | `^2.0.0` | Lint + format (root only) |
 | `@ckb-ccc/fiber` | `^0.0.0-canary-20260505020844` | Fiber SDK (`fiber-rpc` only) |
+| `@types/vscode` | `^1.90.0` | VS Code API types (`apps/vscode` only) |
+| `esbuild` | `^0.25.0` | Extension bundling (`apps/vscode` only) |
 
 ## Where each dependency is declared
 
@@ -24,12 +26,12 @@ Shared dependency versions are defined once in [`pnpm-workspace.yaml`](../pnpm-w
 | `typescript` | Available at root; version pinned via catalog |
 | `vitest` | Available at root; version pinned via catalog |
 
-### All packages + app stubs (`shared`, `fiber-rpc`, `diagnostics`, `web`, `vscode`)
+### All packages + apps (`shared`, `fiber-rpc`, `diagnostics`, `web`, `vscode`)
 
 | Dependency | Role |
 |------------|------|
 | `typescript` | `tsc --noEmit` per workspace |
-| `tsup` | `pnpm build` bundle to `dist/` |
+| `tsup` | `pnpm build` bundle to `dist/` (packages only; web uses Next.js, vscode uses esbuild) |
 | `vitest` | `pnpm test` per workspace |
 
 > Each workspace still **declares** tools it uses (so `tsc`/`vitest`/`tsup` resolve under pnpm), but **versions** come from the catalog — no drift across `^5.8.3` copies.
@@ -55,5 +57,5 @@ Shared dependency versions are defined once in [`pnpm-workspace.yaml`](../pnpm-w
 |------|----------|-----|
 | `@biomejs/biome` | Root only | Single lint/format config in `biome.json` |
 | `turbo` | Root only | Orchestrates all workspace tasks |
-| `next` | Not yet | Phase 3 — `apps/web` only when scaffolded |
-| `@types/vscode` | Not yet | Phase 5 — `apps/vscode` only |
+| `next` | `apps/web` only | Web dashboard |
+| `@types/vscode` + `esbuild` | `apps/vscode` only | Extension types and bundling (`fiberguard-vscode` uses esbuild, not tsup) |

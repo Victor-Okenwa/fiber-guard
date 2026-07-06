@@ -32,6 +32,11 @@ function truncateHash(hash: string): string {
   return hash.length > 14 ? `${hash.slice(0, 10)}…${hash.slice(-4)}` : hash;
 }
 
+function formatPaymentAmount(amount: bigint | undefined): string {
+  if (amount === undefined || amount === 0n) return '—';
+  return formatCkbFromShannons(amount);
+}
+
 function formatTimestamp(value: string | bigint | undefined): string {
   if (value === undefined) return '—';
   const n = typeof value === 'bigint' ? value : parseHexAmount(value);
@@ -80,7 +85,7 @@ export function PaymentsView() {
         <StaleIndicator lastFetchedAt={lastFetchedAt} intervalMs={POLL_MS} />
       </div>
 
-      {isLoading && !data && <TableSkeleton columns={4} />}
+      {isLoading && !data && <TableSkeleton columns={5} />}
 
       {error && !data && <NodeUnreachableAlert />}
 
@@ -97,6 +102,7 @@ export function PaymentsView() {
               <TableRow>
                 <TableHead>Hash</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Amount</TableHead>
                 <TableHead>Fee</TableHead>
                 <TableHead>Updated</TableHead>
               </TableRow>
@@ -113,6 +119,13 @@ export function PaymentsView() {
                   </TableCell>
                   <TableCell>
                     <PaymentStatusBadge status={payment.status} />
+                  </TableCell>
+                  <TableCell className="font-mono text-sm tabular-nums">
+                    {formatPaymentAmount(
+                      payment.amount !== undefined
+                        ? parseHexAmount(payment.amount as unknown as string)
+                        : undefined,
+                    )}
                   </TableCell>
                   <TableCell className="font-mono text-sm tabular-nums">
                     {formatCkbFromShannons(parseHexAmount(payment.fee as unknown as string))}
@@ -144,6 +157,14 @@ export function PaymentsView() {
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-2">
                 <PaymentStatusBadge status={detail.payment.status} />
+                <span className="font-mono text-sm tabular-nums text-muted-foreground">
+                  Amount:{' '}
+                  {formatPaymentAmount(
+                    detail.payment.amount !== undefined
+                      ? parseHexAmount(detail.payment.amount as unknown as string)
+                      : undefined,
+                  )}
+                </span>
                 <span className="font-mono text-sm tabular-nums text-muted-foreground">
                   Fee:{' '}
                   {formatCkbFromShannons(parseHexAmount(detail.payment.fee as unknown as string))}

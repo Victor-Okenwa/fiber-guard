@@ -61,9 +61,7 @@ export function DiagnosticCard({ diagnostic, context }: DiagnosticCardProps) {
         {aiExplanation ? (
           <MarkdownContent content={aiExplanation} />
         ) : (
-          <p className="min-w-0 wrap-anywhere leading-relaxed">
-            {displayExplanation}
-          </p>
+          <p className="min-w-0 wrap-anywhere leading-relaxed">{displayExplanation}</p>
         )}
         {diagnostic.remediation && !aiExplanation && (
           <p className="min-w-0 wrap-anywhere text-sm text-muted-foreground">

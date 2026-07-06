@@ -18,8 +18,7 @@ type InlineToken =
   | { type: 'code'; value: string }
   | { type: 'link'; label: string; href: string };
 
-const INLINE_PATTERN =
-  /(\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\))/g;
+const INLINE_PATTERN = /(\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\))/g;
 
 const LABELED_SECTION_PATTERN = /\*\*([^*]+):\*\*\s*/g;
 
@@ -103,8 +102,7 @@ function parseLabeledSections(content: string): LabeledSection[] | null {
     }
 
     const start = (match.index ?? 0) + match[0].length;
-    const end =
-      i + 1 < matches.length ? (matches[i + 1].index ?? content.length) : content.length;
+    const end = i + 1 < matches.length ? (matches[i + 1].index ?? content.length) : content.length;
 
     sections.push({
       label,

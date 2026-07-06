@@ -9,7 +9,7 @@
     "dev:fiber-rpc": "turbo run dev --filter=@fiberguard/fiber-rpc",
     "dev:diagnostics": "turbo run dev --filter=@fiberguard/diagnostics",
     "dev:web": "turbo run dev --filter=@fiberguard/web",
-    "dev:vscode": "turbo run dev --filter=@fiberguard/vscode",
+    "dev:vscode": "turbo run dev --filter=fiberguard-vscode",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "biome check .",
@@ -21,5 +21,11 @@
     "turbo": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
   }
 }

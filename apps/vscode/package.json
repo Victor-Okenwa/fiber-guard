@@ -1,19 +1,117 @@
 {
-  "name": "@fiberguard/vscode",
+  "name": "fiberguard-vscode",
+  "displayName": "FiberGuard",
+  "description": "Fiber node diagnostics in VS Code: health, channels, peers, payment failure analysis, and can-i-pay checks.",
   "version": "0.0.0",
+  "publisher": "fiberguard",
   "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+  "main": "./dist/extension.cjs",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "contributes": {
+    "configuration": {
+      "title": "FiberGuard",
+      "properties": {
+        "fiberguard.nodeUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8227",
+          "description": "Fiber node JSON-RPC endpoint."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "fiberguard.nodeStatus",
+        "category": "FiberGuard",
+        "title": "Health Details",
+        "icon": "$(heart)",
+        "tooltip": "Assess node health score, diagnostics, and recommendations"
+      },
+      {
+        "command": "fiberguard.canIPay",
+        "category": "FiberGuard",
+        "title": "Can I Pay?",
+        "icon": "$(credit-card)",
+        "tooltip": "Check invoice success probability and blockers before sendPayment"
+      },
+      {
+        "command": "fiberguard.diagnosePayment",
+        "category": "FiberGuard",
+        "title": "Diagnose Payment",
+        "icon": "$(search-fuzzy)",
+        "tooltip": "Inspect a payment hash and show structured failure diagnostics"
+      },
+      {
+        "command": "fiberguard.viewPayments",
+        "category": "FiberGuard",
+        "title": "View All Payments",
+        "icon": "$(list-flat)",
+        "tooltip": "Open a table of recent payments with amount, fee, and status"
+      },
+      {
+        "command": "fiberguard.refresh",
+        "category": "FiberGuard",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "fiberguard",
+          "title": "FiberGuard",
+          "icon": "$(pulse)"
+        }
+      ]
+    },
+    "views": {
+      "fiberguard": [
+        {
+          "id": "fiberguard.explorer",
+          "name": "Node Explorer",
+          "icon": "$(pulse)"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "fiberguard.nodeStatus",
+          "when": "view == fiberguard.explorer",
+          "group": "navigation@1"
+        },
+        {
+          "command": "fiberguard.canIPay",
+          "when": "view == fiberguard.explorer",
+          "group": "navigation@2"
+        },
+        {
+          "command": "fiberguard.diagnosePayment",
+          "when": "view == fiberguard.explorer",
+          "group": "navigation@3"
+        },
+        {
+          "command": "fiberguard.viewPayments",
+          "when": "view == fiberguard.explorer",
+          "group": "navigation@4"
+        },
+        {
+          "command": "fiberguard.refresh",
+          "when": "view == fiberguard.explorer",
+          "group": "navigation@5"
+        }
+      ]
     }
   },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "node esbuild.mjs",
+    "dev": "node esbuild.mjs --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "biome check ."
@@ -24,7 +122,8 @@
     "@fiberguard/shared": "workspace:*"
   },
   "devDependencies": {
-    "tsup": "catalog:",
+    "@types/vscode": "catalog:",
+    "esbuild": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

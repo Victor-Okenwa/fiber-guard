@@ -29,6 +29,8 @@ export type PaymentStatus = 'Created' | 'Inflight' | 'Success' | 'Failed';
 export interface PaymentInfo {
   paymentHash: string;
   status: PaymentStatus;
+  /** Transfer amount in shannons when available from route or RPC payload. */
+  amount?: bigint;
   fee: bigint;
   failedError?: string;
   createdAt?: bigint;
