@@ -44,3 +44,4 @@ Press **F5** in VS Code with the repo open to launch an Extension Development Ho
 
 - [FiberGuard repository](https://github.com/Victor-Okenwa/fiber-guard)
 - [Fiber documentation](https://github.com/nervosnetwork/fiber)
+- [Changelog](./CHANGELOG.md)

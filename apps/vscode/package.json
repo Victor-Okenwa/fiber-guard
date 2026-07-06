@@ -2,7 +2,7 @@
   "name": "fiberguard-vscode",
   "displayName": "FiberGuard",
   "description": "Fiber node diagnostics in VS Code: health, channels, peers, payment failure analysis, and can-i-pay checks.",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "publisher": "fiberguard",
   "type": "module",
   "main": "./dist/extension.cjs",
