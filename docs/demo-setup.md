@@ -93,6 +93,34 @@ FiberGuard **health, peers, and node info** work with **zero channels**. Payment
 
 ---
 
+## Option D — Hosted Vercel demo (public testnet RPC)
+
+Best for: hackathon judges and visitors — **no local Fiber node required**.
+
+The production dashboard on Vercel uses a public Fiber testnet node's JSON-RPC:
+
+```
+FIBER_RPC_URL=http://18.162.235.225:8227
+```
+
+Set this in Vercel environment variables. The dashboard shows live data from that public node (channels, peers, payments, health).
+
+| Aspect | Detail |
+|--------|--------|
+| Setup | See [docs/deploy-vercel.md](deploy-vercel.md) |
+| Data source | Public testnet node 1 — not your local FNN |
+| Local dev | Keep `FIBER_RPC_URL=http://127.0.0.1:8227` in `apps/web/.env.local` |
+| VS Code extension | Still uses your local node via `fiberguard.nodeUrl` |
+
+```bash
+# Verify public RPC before deploying
+curl -s http://18.162.235.225:8227 \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","method":"node_info","params":[],"id":1}'
+```
+
+---
+
 ## Optional — Second node for failure demos
 
 For **payment failure** scenarios (insufficient liquidity, unreachable peer):
@@ -110,7 +138,7 @@ Document the invoice / payment hash used in demo video notes.
 | Variable | Purpose |
 |----------|---------|
 | `NO_PROXY=127.0.0.1,localhost` | Prevents proxy 503 errors with `fnn-cli` |
-| `FIBER_RPC_URL` | FiberGuard will use `http://127.0.0.1:8227` by default |
+| `FIBER_RPC_URL` | `http://127.0.0.1:8227` locally; `http://18.162.235.225:8227` on Vercel |
 | `FIBER_SECRET_KEY_PASSWORD` | Required when starting `fnn` |
 
 ## References
@@ -118,4 +146,5 @@ Document the invoice / payment hash used in demo video notes.
 - [Run a Fiber Node](https://www.fiber.world/docs/quick-start/run-a-node)
 - [Basic Transfer Example](https://www.fiber.world/docs/quick-start/basic-transfer)
 - [Connect Public Nodes](https://www.fiber.world/docs/quick-start/connect-nodes)
+- [Deploy to Vercel](deploy-vercel.md)
 - [JavaScript SDK](https://www.fiber.world/docs/build/sdk/js)

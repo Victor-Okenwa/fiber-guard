@@ -2,9 +2,8 @@
   "name": "fiberguard-vscode",
   "displayName": "FiberGuard",
   "description": "Fiber node diagnostics in VS Code: health, channels, peers, payment failure analysis, and can-i-pay checks.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "publisher": "fiberguard",
-  "private": true,
   "type": "module",
   "main": "./dist/extension.cjs",
   "icon": "extension-icon.png",
@@ -18,6 +17,24 @@
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "fiber",
+    "nervos",
+    "ckb",
+    "lightning",
+    "diagnostics",
+    "payment-channels",
+    "blockchain"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Victor-Okenwa/fiber-guard.git",
+    "directory": "apps/vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/Victor-Okenwa/fiber-guard/issues"
+  },
+  "homepage": "https://github.com/Victor-Okenwa/fiber-guard#readme",
   "activationEvents": [],
   "contributes": {
     "configuration": {
@@ -143,20 +160,28 @@
   },
   "scripts": {
     "build": "node esbuild.mjs",
+    "build:release": "turbo run build --filter=fiberguard-vscode...",
     "dev": "node esbuild.mjs --watch",
+    "vscode:prepublish": "pnpm run build:release",
+    "prepackage": "pnpm run build:release",
+    "package": "vsce package --no-dependencies",
+    "publish:marketplace": "vsce publish --no-dependencies",
+    "publish:openvsx": "ovsx publish --no-dependencies",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "biome check ."
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@fiberguard/diagnostics": "workspace:*",
     "@fiberguard/fiber-rpc": "workspace:*",
-    "@fiberguard/shared": "workspace:*"
-  },
-  "devDependencies": {
-    "@types/vscode": "catalog:",
-    "esbuild": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "@fiberguard/shared": "workspace:*",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.7.1",
+    "esbuild": "^0.25.0",
+    "ovsx": "^0.10.8",
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   }
 }

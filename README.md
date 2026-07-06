@@ -4,7 +4,15 @@
 
 FiberGuard helps node operators and developers understand what is happening in their Fiber node, why payments fail, and how to improve reliability — through a web dashboard and a VS Code extension.
 
-Built for the [**Gone in 60ms: Fiber Network Infrastructure Hackathon**](https://nervos.org).
+Built for [**Gone in 60ms: Fiber Network Infrastructure Hackathon**](https://talk.nervos.org/t/gone-in-60ms-fiber-network-infrastructure-hackathon-announcement/10418) — **Category 2:** Node, Routing, Cross-Chain, and Diagnostics Infrastructure.
+
+### Live demo
+
+The web dashboard is hosted on **Vercel** and connects to a [public Fiber testnet node](https://www.fiber.world/docs/quick-start/connect-nodes) for live RPC data — no local Fiber node required to try the hosted URL.
+
+> Add your Vercel deployment URL here after deploy, e.g. `https://fiberguard.vercel.app`
+
+For your own node, run locally (see [Development](#development)) or set `FIBER_RPC_URL` to your RPC endpoint. Deployment details: [docs/deploy-vercel.md](docs/deploy-vercel.md).
 
 ---
 
@@ -83,24 +91,31 @@ fibergaurd/
 │   ├── ckb-rpc/             # CKB testnet RPC client
 │   ├── diagnostics/         # Payment analysis, can-i-pay, routing
 │   └── shared/              # Shared types, constants, formatters
+├── docs/
+│   ├── demo-setup.md        # Local node + channel demo scenarios
+│   └── deploy-vercel.md       # Vercel + public testnet RPC hosting
 ├── .cursor/rules/           # AI/editor coding rules for this project
 └── README.md
 ```
-
-> **Status:** Phase 1 complete — pnpm + Turborepo monorepo with `@fiberguard/*` package stubs. Next: Phase 2 core packages.
 
 ---
 
 ## Prerequisites
 
+### Try the hosted dashboard (no setup)
+
+Open the Vercel URL above. It uses `FIBER_RPC_URL=http://18.162.235.225:8227` (public Fiber testnet node).
+
+### Local development
+
 - **Node.js** ≥ 20
-- **pnpm** ≥ 9 (recommended package manager for the monorepo)
-- A running **Fiber node** with JSON-RPC enabled (default port **8227**)
-- Access to **CKB testnet** RPC (for on-chain context)
+- **pnpm** ≥ 9 (repo pins `pnpm@10.18.3` via Corepack)
+- A running **Fiber node** with JSON-RPC on port **8227** (for local dev and VS Code extension)
+- Access to **CKB testnet** RPC (optional; for on-chain context)
 
-### Running a Fiber node
+### Running a Fiber node (local)
 
-Refer to the [Fiber documentation](https://github.com/nervosnetwork/fiber) for installation and configuration. FiberGuard expects a local RPC endpoint:
+Refer to the [Fiber documentation](https://www.fiber.world/docs) for installation. FiberGuard defaults to a local RPC endpoint:
 
 ```
 http://127.0.0.1:8227
@@ -116,20 +131,19 @@ curl -X POST http://127.0.0.1:8227 \
   -d '{"jsonrpc":"2.0","method":"node_info","params":[],"id":1}'
 ```
 
-For channel setup before payment demos, see [docs/demo-setup.md](docs/demo-setup.md).
+For channel setup and demo scenarios, see [docs/demo-setup.md](docs/demo-setup.md).
 
 ---
 
 ## Development
-
-> Commands below will be updated once the monorepo is scaffolded.
 
 ```bash
 # Install dependencies
 pnpm install
 
 # Start the web dashboard (dev)
-pnpm --filter @fiberguard/web dev
+pnpm dev:web
+# or: pnpm --filter @fiberguard/web dev
 
 # Build all packages
 pnpm build
@@ -143,14 +157,25 @@ pnpm typecheck
 pnpm format   # auto-fix with Biome
 ```
 
+Copy `apps/web/.env.local.example` to `apps/web/.env.local` for local environment variables.
+
 ### Environment variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `FIBER_RPC_URL` | `http://127.0.0.1:8227` | Fiber node JSON-RPC endpoint |
-| `CKB_RPC_URL` | *(testnet URL)* | CKB testnet RPC endpoint |
+| Variable | Local default | Description |
+|----------|---------------|-------------|
+| `FIBER_RPC_URL` | `http://127.0.0.1:8227` | Fiber JSON-RPC endpoint (server-side only) |
+| `CKB_RPC_URL` | `https://testnet.ckbapp.dev/` | CKB testnet RPC |
+| `GROQ_API_KEY` | *(unset)* | Optional — AI-augmented diagnostic explanations |
+| `GROQ_MODEL` | `llama-3.3-70b-versatile` | Groq model when API key is set |
 
-Copy `.env.example` to `.env.local` in `apps/web` once available.
+**Vercel (hosted demo):** set `FIBER_RPC_URL=http://18.162.235.225:8227` and `ENABLE_EXPERIMENTAL_COREPACK=1`. See [docs/deploy-vercel.md](docs/deploy-vercel.md).
+
+### Deploy to Vercel
+
+1. Import the repo; set **Root Directory** to `apps/web`.
+2. Enable **Include files outside Root Directory**.
+3. Set environment variables (see [docs/deploy-vercel.md](docs/deploy-vercel.md)).
+4. `apps/web/vercel.json` configures pnpm workspace install and Turbo build.
 
 ### VS Code extension
 
@@ -210,18 +235,37 @@ Project-specific AI guidance lives in [`.cursor/rules/`](.cursor/rules/):
 
 ---
 
+## What works today
+
+| Surface | Status | Notes |
+|---------|--------|-------|
+| Web dashboard (Vercel) | **Working** | Live RPC via public Fiber testnet node |
+| Web dashboard (local) | **Working** | Requires local FNN on `:8227` |
+| Health, channels, peers | **Working** | Real RPC data |
+| Payment failure diagnostics | **Working** | Against node payment history |
+| Can I Pay? | **Working** | Invoice parse + liquidity/blocker analysis |
+| VS Code extension | **Working** | Local node via `fiberguard.nodeUrl` |
+| Groq AI explanations | **Optional** | Needs `GROQ_API_KEY`; falls back to static diagnostics |
+| Route simulation | **Future** | Planned |
+| CKB on-chain context (`ckb-rpc`) | **Future** | Package stub; env var reserved |
+| Alerting / uptime monitoring | **Future** | Post-hackathon |
+
+### Why FiberGuard?
+
+[Fiber Dashboard](https://www.fiber.world/showcase) and [Fiber Studio](https://www.fiber.world/showcase) focus on network visibility and node setup. FiberGuard targets **reliability engineering** — plain-English payment failure diagnosis, pre-flight “Can I Pay?” checks, and actionable remediation for operators and developers building on Fiber.
+
+---
+
 ## Roadmap
 
-- [x] Monorepo scaffold (pnpm workspaces, TypeScript, Biome)
-- [x] `packages/shared` — domain types, formatters, diagnostic codes
-- [x] `packages/fiber-rpc` — typed client wrapping `@ckb-ccc/fiber`
-- [x] `packages/diagnostics` — health, payment failure, can-i-pay logic
-- [ ] Web dashboard — node health and channel overview
-- [ ] Payment failure diagnostics
-- [ ] "Can I Pay?" checker
+- [x] Monorepo scaffold (pnpm workspaces, TypeScript, Biome, Turborepo)
+- [x] `packages/shared`, `fiber-rpc`, `diagnostics`
+- [x] Web dashboard — health, channels, peers, payments, can-i-pay
+- [x] VS Code extension — node status, can-i-pay, payment diagnose
+- [x] Vercel hosted demo (public testnet RPC)
 - [ ] Route simulation tools
-- [ ] Actionable recommendations
-- [ ] VS Code extension
+- [ ] CKB on-chain context in dashboard
+- [ ] Alerting for unhealthy nodes / weak routes
 
 ---
 
@@ -257,4 +301,4 @@ TBD
 
 - [Fiber (GitHub)](https://github.com/nervosnetwork/fiber)
 - [Nervos CKB](https://nervos.org)
-- [Gone in 60ms Hackathon](https://nervos.org)
+- [Gone in 60ms Hackathon](https://talk.nervos.org/t/gone-in-60ms-fiber-network-infrastructure-hackathon-announcement/10418)

@@ -4,6 +4,7 @@ import { formatCkbFromShannons, parseHexAmount } from '@fiberguard/shared';
 import { LiquidityBar } from '@/components/channels/liquidity-bar';
 import { CopyableTruncatedText } from '@/components/data/copyable-text';
 import { StaleIndicator } from '@/components/data/stale-indicator';
+import { TablePagination } from '@/components/data/table-pagination';
 import { TableSkeleton } from '@/components/data/table-skeleton';
 import { NodeUnreachableAlert } from '@/components/node/node-unreachable-alert';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useClientPagination } from '@/hooks/use-client-pagination';
 import { usePoll } from '@/hooks/use-poll';
 import { fetchChannels } from '@/lib/api-client';
 
@@ -24,6 +26,7 @@ export function ChannelsView() {
   const { data, error, isLoading, lastFetchedAt } = usePoll(fetchChannels, {
     intervalMs: POLL_MS,
   });
+  const pagination = useClientPagination(data);
 
   return (
     <div className="space-y-6">
@@ -59,7 +62,7 @@ export function ChannelsView() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((ch) => {
+              {pagination.pageItems.map((ch) => {
                 const notReady = ch.stateName !== 'ChannelReady';
                 return (
                   <TableRow key={ch.channelId}>
@@ -94,6 +97,13 @@ export function ChannelsView() {
               })}
             </TableBody>
           </Table>
+          <TablePagination
+            rangeLabel={pagination.rangeLabel}
+            hasPrevious={pagination.hasPrevious}
+            hasNext={pagination.hasNext}
+            onPrevious={pagination.goPrevious}
+            onNext={pagination.goNext}
+          />
         </div>
       )}
     </div>

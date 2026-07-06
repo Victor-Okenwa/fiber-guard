@@ -139,22 +139,22 @@ Progress tracker only. Product context → [README.md](README.md). Coding conven
 - [ ] Full demo script written and rehearsed (health → failed payment → can-i-pay)
 - [ ] `pnpm build` clean on all packages
 - [ ] `pnpm test` passes (diagnostics unit tests)
-- [ ] README updated: real commands, env vars, demo prerequisites
-- [ ] Document **working vs simulated vs future** explicitly
+- [x] README updated: real commands, env vars, demo prerequisites
+- [x] Document **working vs simulated vs future** explicitly
 - [ ] Fix any RPC method name mismatches found against live Fiber version
 
 ---
 
 ## Phase 7 — Hackathon submission (Day 12)
 
-- [ ] Project summary + **Category 2** stated in README
+- [x] Project summary + **Category 2** stated in README
 - [ ] Team members listed
 - [ ] Open-source repo public and runnable
 - [ ] Demo video recorded (3–5 min): problem → dashboard → payment diagnostic → can-i-pay → VS Code
-- [ ] Runnable demo instructions in README (local Fiber node required)
-- [ ] Technical breakdown (architecture diagram, package responsibilities)
-- [ ] Fiber infrastructure gap explanation (why FiberGuard vs Dashboard/Studio)
-- [ ] Future roadmap section
+- [x] Runnable demo instructions in README (hosted Vercel URL + optional local node)
+- [x] Technical breakdown (architecture diagram, package responsibilities)
+- [x] Fiber infrastructure gap explanation (why FiberGuard vs Dashboard/Studio)
+- [x] Future roadmap section
 - [ ] License chosen (e.g. MIT)
 - [ ] CKBoost submission form completed
 - [ ] AI allowance claim filed if applicable ($20 rebate)

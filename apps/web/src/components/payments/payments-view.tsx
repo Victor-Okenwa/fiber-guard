@@ -1,9 +1,10 @@
 'use client';
 
 import { formatCkbFromShannons, parseHexAmount } from '@fiberguard/shared';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CopyableTruncatedText } from '@/components/data/copyable-text';
 import { StaleIndicator } from '@/components/data/stale-indicator';
+import { TablePagination } from '@/components/data/table-pagination';
 import { TableSkeleton } from '@/components/data/table-skeleton';
 import { DiagnosticList } from '@/components/diagnostics/diagnostic-list';
 import { NodeUnreachableAlert } from '@/components/node/node-unreachable-alert';
@@ -23,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { usePoll } from '@/hooks/use-poll';
+import { TABLE_PAGE_SIZE, useCursorPagination } from '@/hooks/use-cursor-pagination';
 import type { PaymentDetailResponse } from '@/lib/api-client';
 import { fetchPaymentDetail, fetchPayments } from '@/lib/api-client';
 
@@ -43,9 +44,25 @@ function formatTimestamp(value: string | bigint | undefined): string {
 }
 
 export function PaymentsView() {
-  const { data, error, isLoading, lastFetchedAt } = usePoll(fetchPayments, {
-    intervalMs: POLL_MS,
-  });
+  const fetchPage = useCallback(
+    (after?: string) =>
+      fetchPayments({ limit: TABLE_PAGE_SIZE, after }).then((result) => ({
+        items: result.payments,
+        lastCursor: result.lastCursor,
+      })),
+    [],
+  );
+  const {
+    items: payments,
+    error,
+    isLoading,
+    lastFetchedAt,
+    hasPrevious,
+    hasNext,
+    rangeLabel,
+    goPrevious,
+    goNext,
+  } = useCursorPagination(fetchPage, { intervalMs: POLL_MS });
   const [selectedHash, setSelectedHash] = useState<string | null>(null);
   const [detail, setDetail] = useState<PaymentDetailResponse | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -82,17 +99,17 @@ export function PaymentsView() {
         <StaleIndicator lastFetchedAt={lastFetchedAt} intervalMs={POLL_MS} />
       </div>
 
-      {isLoading && !data && <TableSkeleton columns={5} />}
+      {isLoading && payments.length === 0 && <TableSkeleton columns={5} />}
 
-      {error && !data && <NodeUnreachableAlert />}
+      {error && payments.length === 0 && <NodeUnreachableAlert />}
 
-      {data && data.payments.length === 0 && (
+      {!isLoading && !error && payments.length === 0 && (
         <p className="text-sm text-muted-foreground">
           No payments yet. Send a test payment from your Fiber node to populate history.
         </p>
       )}
 
-      {data && data.payments.length > 0 && (
+      {payments.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-border">
           <Table>
             <TableHeader>
@@ -105,7 +122,7 @@ export function PaymentsView() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.payments.map((payment) => (
+              {payments.map((payment) => (
                 <TableRow
                   key={payment.paymentHash}
                   className="cursor-pointer"
@@ -139,6 +156,14 @@ export function PaymentsView() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            rangeLabel={rangeLabel}
+            hasPrevious={hasPrevious}
+            hasNext={hasNext}
+            onPrevious={goPrevious}
+            onNext={goNext}
+            disabled={isLoading}
+          />
         </div>
       )}
 

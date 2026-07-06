@@ -14,6 +14,12 @@ export function activate(context: vscode.ExtensionContext): void {
     outputChannel,
     vscode.window.registerTreeDataProvider('fiberguard.explorer', treeProvider),
     vscode.commands.registerCommand('fiberguard.refresh', () => treeProvider.refresh()),
+    vscode.commands.registerCommand(
+      'fiberguard.treePaginate',
+      (section: 'channels' | 'peers', delta: number) => {
+        treeProvider.paginate(section, delta);
+      },
+    ),
     vscode.commands.registerCommand('fiberguard.nodeStatus', () =>
       nodeStatusCommand(outputChannel),
     ),

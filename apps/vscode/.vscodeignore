@@ -4,3 +4,7 @@ esbuild.mjs
 tsconfig.json
 **/*.map
 **/*.test.*
+.vscode/**
+scripts/**
+vitest.config.*
+.turbo/**

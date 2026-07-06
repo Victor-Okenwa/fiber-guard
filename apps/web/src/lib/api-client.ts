@@ -28,6 +28,11 @@ export interface PaymentsListResponse {
   lastCursor?: string;
 }
 
+export interface FetchPaymentsParams {
+  limit?: number;
+  after?: string;
+}
+
 export interface PaymentDetailResponse {
   payment: PaymentInfo;
   diagnostics: Diagnostic[];
@@ -69,8 +74,12 @@ export async function fetchPeers(): Promise<PeerInfo[]> {
   return parseJson<PeerInfo[]>(res);
 }
 
-export async function fetchPayments(): Promise<PaymentsListResponse> {
-  const res = await fetch('/api/payments', { cache: 'no-store' });
+export async function fetchPayments(params?: FetchPaymentsParams): Promise<PaymentsListResponse> {
+  const search = new URLSearchParams();
+  if (params?.limit !== undefined) search.set('limit', String(params.limit));
+  if (params?.after) search.set('after', params.after);
+  const query = search.toString();
+  const res = await fetch(`/api/payments${query ? `?${query}` : ''}`, { cache: 'no-store' });
   return parseJson<PaymentsListResponse>(res);
 }
 

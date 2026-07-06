@@ -3,6 +3,13 @@ import { formatCkbFromShannons } from '@fiberguard/shared';
 import * as vscode from 'vscode';
 import { getFiberClient } from '../lib/fiber-client.js';
 import { truncateMiddle } from '../lib/format.js';
+import {
+  pageRangeLabel,
+  paginateSlice,
+  sectionLabel,
+  TREE_PAGE_SIZE,
+  totalPages,
+} from '../lib/pagination.js';
 import { describeRpcError } from '../lib/rpc-error.js';
 
 type NodeKind =
@@ -12,7 +19,10 @@ type NodeKind =
   | 'action'
   | 'channel'
   | 'peer'
-  | 'message';
+  | 'message'
+  | 'page-control';
+
+export type TreeSection = 'channels' | 'peers';
 
 interface ActionDefinition {
   label: string;
@@ -48,7 +58,7 @@ const ACTIONS: ActionDefinition[] = [
     command: 'fiberguard.viewPayments',
     icon: 'list-flat',
     tooltip:
-      '**View All Payments**\n\nOpen a table of recent payments with hash, status, amount, fee, and last updated time.',
+      '**View All Payments**\n\nOpen a paginated table of recent payments with hash, status, amount, fee, and last updated time.',
   },
 ];
 
@@ -74,8 +84,27 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
   private channels: ChannelInfo[] = [];
   private peers: PeerInfo[] = [];
   private loadError: string | null = null;
+  private channelPage = 1;
+  private peerPage = 1;
 
   refresh(): void {
+    this.channelPage = 1;
+    this.peerPage = 1;
+    this.onDidChangeEmitter.fire(undefined);
+  }
+
+  paginate(section: TreeSection, delta: number): void {
+    const total = section === 'channels' ? this.channels.length : this.peers.length;
+    const pages = totalPages(total);
+    const current = section === 'channels' ? this.channelPage : this.peerPage;
+    const next = Math.min(Math.max(1, current + delta), pages);
+
+    if (section === 'channels') {
+      this.channelPage = next;
+    } else {
+      this.peerPage = next;
+    }
+
     this.onDidChangeEmitter.fire(undefined);
   }
 
@@ -97,8 +126,11 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
       }
       return [
         this.sectionItem('section-actions', 'Actions'),
-        this.sectionItem('section-channels', `Channels (${this.channels.length})`),
-        this.sectionItem('section-peers', `Peers (${this.peers.length})`),
+        this.sectionItem(
+          'section-channels',
+          sectionLabel('Channels', this.channelPage, this.channels.length),
+        ),
+        this.sectionItem('section-peers', sectionLabel('Peers', this.peerPage, this.peers.length)),
       ];
     }
 
@@ -115,6 +147,11 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
       this.channels = channels;
       this.peers = peers;
       this.loadError = null;
+
+      const channelPages = totalPages(channels.length);
+      const peerPages = totalPages(peers.length);
+      if (this.channelPage > channelPages) this.channelPage = channelPages;
+      if (this.peerPage > peerPages) this.peerPage = peerPages;
     } catch (error) {
       this.channels = [];
       this.peers = [];
@@ -147,6 +184,50 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
     return item;
   }
 
+  private paginationItems(section: TreeSection, page: number, total: number): FiberTreeItem[] {
+    const pages = totalPages(total);
+    if (pages <= 1) return [];
+
+    const items: FiberTreeItem[] = [];
+    const range = pageRangeLabel(page, total);
+
+    if (page > 1) {
+      const prev = new FiberTreeItem(
+        'page-control',
+        'Previous page',
+        vscode.TreeItemCollapsibleState.None,
+      );
+      prev.iconPath = new vscode.ThemeIcon('chevron-left');
+      prev.command = {
+        command: 'fiberguard.treePaginate',
+        title: 'Previous page',
+        arguments: [section, -1],
+      };
+      items.push(prev);
+    }
+
+    const info = new FiberTreeItem('message', range, vscode.TreeItemCollapsibleState.None);
+    info.iconPath = new vscode.ThemeIcon('list-selection');
+    items.push(info);
+
+    if (page < pages) {
+      const next = new FiberTreeItem(
+        'page-control',
+        'Next page',
+        vscode.TreeItemCollapsibleState.None,
+      );
+      next.iconPath = new vscode.ThemeIcon('chevron-right');
+      next.command = {
+        command: 'fiberguard.treePaginate',
+        title: 'Next page',
+        arguments: [section, 1],
+      };
+      items.push(next);
+    }
+
+    return items;
+  }
+
   private channelItems(): FiberTreeItem[] {
     if (this.channels.length === 0) {
       return [
@@ -155,29 +236,34 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
         ),
       ];
     }
-    return this.channels.map((channel) => {
-      const ready = channel.stateName === 'ChannelReady';
-      const item = new FiberTreeItem(
-        'channel',
-        truncateMiddle(channel.channelId),
-        vscode.TreeItemCollapsibleState.None,
-      );
-      item.description = `${channel.stateName} · local ${formatCkbFromShannons(channel.localBalance)} / cap ${formatCkbFromShannons(channel.capacity)}`;
-      item.iconPath = new vscode.ThemeIcon(
-        ready ? 'pass' : 'warning',
-        ready ? undefined : new vscode.ThemeColor('list.warningForeground'),
-      );
-      item.contextValue = 'copyableChannel';
-      item.copyValue = channel.channelId;
-      item.tooltip = [
-        `Channel ${channel.channelId}`,
-        `State: ${channel.stateName}${channel.enabled ? '' : ' (disabled)'}`,
-        `Local: ${formatCkbFromShannons(channel.localBalance)}`,
-        `Remote: ${formatCkbFromShannons(channel.remoteBalance)}`,
-        `Capacity: ${formatCkbFromShannons(channel.capacity)}`,
-      ].join('\n');
-      return item;
-    });
+
+    const pageItems = paginateSlice(this.channels, this.channelPage);
+    return [
+      ...this.paginationItems('channels', this.channelPage, this.channels.length),
+      ...pageItems.map((channel) => {
+        const ready = channel.stateName === 'ChannelReady';
+        const item = new FiberTreeItem(
+          'channel',
+          truncateMiddle(channel.channelId),
+          vscode.TreeItemCollapsibleState.None,
+        );
+        item.description = `${channel.stateName} · local ${formatCkbFromShannons(channel.localBalance)} / cap ${formatCkbFromShannons(channel.capacity)}`;
+        item.iconPath = new vscode.ThemeIcon(
+          ready ? 'pass' : 'warning',
+          ready ? undefined : new vscode.ThemeColor('list.warningForeground'),
+        );
+        item.contextValue = 'copyableChannel';
+        item.copyValue = channel.channelId;
+        item.tooltip = [
+          `Channel ${channel.channelId}`,
+          `State: ${channel.stateName}${channel.enabled ? '' : ' (disabled)'}`,
+          `Local: ${formatCkbFromShannons(channel.localBalance)}`,
+          `Remote: ${formatCkbFromShannons(channel.remoteBalance)}`,
+          `Capacity: ${formatCkbFromShannons(channel.capacity)}`,
+        ].join('\n');
+        return item;
+      }),
+    ];
   }
 
   private peerItems(): FiberTreeItem[] {
@@ -188,32 +274,37 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
         ),
       ];
     }
-    return this.peers.map((peer) => {
-      const item = new FiberTreeItem(
-        'peer',
-        truncateMiddle(peer.pubkey, 8, 6),
-        vscode.TreeItemCollapsibleState.None,
-      );
-      item.description = peer.address;
-      item.iconPath = new vscode.ThemeIcon('vm-connect');
-      item.contextValue = 'copyablePeer';
-      item.copyValue = peer.pubkey;
-      item.secondaryCopyValue = peer.address;
-      const tooltip = new vscode.MarkdownString(
-        [
-          '**Peer connection**',
-          '',
-          `**Public key:** \`${peer.pubkey}\``,
-          '',
-          `**Address:** \`${peer.address}\``,
-          '',
-          '**Status:** Connected',
-        ].join('\n'),
-      );
-      tooltip.isTrusted = true;
-      item.tooltip = tooltip;
-      return item;
-    });
+
+    const pageItems = paginateSlice(this.peers, this.peerPage);
+    return [
+      ...this.paginationItems('peers', this.peerPage, this.peers.length),
+      ...pageItems.map((peer) => {
+        const item = new FiberTreeItem(
+          'peer',
+          truncateMiddle(peer.pubkey, 8, 6),
+          vscode.TreeItemCollapsibleState.None,
+        );
+        item.description = peer.address;
+        item.iconPath = new vscode.ThemeIcon('vm-connect');
+        item.contextValue = 'copyablePeer';
+        item.copyValue = peer.pubkey;
+        item.secondaryCopyValue = peer.address;
+        const tooltip = new vscode.MarkdownString(
+          [
+            '**Peer connection**',
+            '',
+            `**Public key:** \`${peer.pubkey}\``,
+            '',
+            `**Address:** \`${peer.address}\``,
+            '',
+            '**Status:** Connected',
+          ].join('\n'),
+        );
+        tooltip.isTrusted = true;
+        item.tooltip = tooltip;
+        return item;
+      }),
+    ];
   }
 
   private messageItem(text: string): FiberTreeItem {
@@ -222,3 +313,6 @@ export class FiberTreeProvider implements vscode.TreeDataProvider<FiberTreeItem>
     return item;
   }
 }
+
+// Keep TREE_PAGE_SIZE exported for tests and consistency with payments page size.
+export { TREE_PAGE_SIZE };

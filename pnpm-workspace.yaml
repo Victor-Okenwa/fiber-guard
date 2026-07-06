@@ -21,3 +21,5 @@ catalog:
   "@types/react-dom": "^19.2.0"
   "@types/vscode": "^1.90.0"
   esbuild: "^0.25.0"
+  "@vscode/vsce": "^3.7.1"
+  ovsx: "^0.10.8"

@@ -3,8 +3,17 @@ import { formatCkbFromShannons } from '@fiberguard/shared';
 import * as vscode from 'vscode';
 import { getFiberClient } from '../lib/fiber-client.js';
 import { formatPaymentAmount, formatPaymentTimestamp, truncateMiddle } from '../lib/format.js';
+import { PAYMENTS_PAGE_SIZE } from '../lib/pagination.js';
 import { withRpcProgress } from '../lib/progress.js';
 import { reportError } from './report-error.js';
+
+interface PaymentsPageState {
+  payments: PaymentInfo[];
+  pageIndex: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+  rangeLabel: string;
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -23,8 +32,8 @@ function renderCopyButton(value: string, label: string): string {
   </button>`;
 }
 
-function renderPaymentsTable(payments: PaymentInfo[]): string {
-  const rows = payments
+function renderPaymentsTable(state: PaymentsPageState): string {
+  const rows = state.payments
     .map((payment) => {
       const hash = payment.paymentHash;
       const hashEscaped = escapeHtml(hash);
@@ -45,6 +54,9 @@ function renderPaymentsTable(payments: PaymentInfo[]): string {
       </tr>`;
     })
     .join('\n');
+
+  const prevDisabled = state.hasPrevious ? '' : ' disabled';
+  const nextDisabled = state.hasNext ? '' : ' disabled';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -123,6 +135,42 @@ function renderPaymentsTable(payments: PaymentInfo[]): string {
     .status-failed { background: color-mix(in srgb, var(--vscode-errorForeground) 15%, transparent); color: var(--vscode-errorForeground); }
     .status-inflight, .status-created { background: var(--vscode-badge-background); color: var(--vscode-badge-foreground); }
     .hint { margin-top: 12px; color: var(--vscode-descriptionForeground); font-size: 0.9rem; }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--vscode-panel-border);
+    }
+    .pagination-label {
+      color: var(--vscode-descriptionForeground);
+      font-size: 0.85rem;
+    }
+    .pagination-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .page-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border: 1px solid var(--vscode-button-border, var(--vscode-panel-border));
+      border-radius: 4px;
+      background: var(--vscode-button-secondaryBackground, var(--vscode-editor-background));
+      color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+      font: inherit;
+      cursor: pointer;
+    }
+    .page-btn:hover:not(:disabled) {
+      background: var(--vscode-button-secondaryHoverBackground, var(--vscode-list-hoverBackground));
+    }
+    .page-btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
     #toast {
       position: fixed;
       bottom: 16px;
@@ -140,7 +188,7 @@ function renderPaymentsTable(payments: PaymentInfo[]): string {
   </style>
 </head>
 <body>
-  <h1>Recent payments (${payments.length})</h1>
+  <h1>Recent payments</h1>
   <table>
     <thead>
       <tr>
@@ -155,6 +203,13 @@ function renderPaymentsTable(payments: PaymentInfo[]): string {
       ${rows}
     </tbody>
   </table>
+  <div class="pagination">
+    <span class="pagination-label">${escapeHtml(state.rangeLabel)}</span>
+    <div class="pagination-actions">
+      <button type="button" class="page-btn" id="prev-page"${prevDisabled}>Previous</button>
+      <button type="button" class="page-btn" id="next-page"${nextDisabled}>Next</button>
+    </div>
+  </div>
   <p class="hint">Use <strong>FiberGuard: Diagnose Payment</strong> with a payment hash for failure diagnostics.</p>
   <div id="toast" role="status" aria-live="polite"></div>
   <script>
@@ -179,20 +234,58 @@ function renderPaymentsTable(payments: PaymentInfo[]): string {
         showToast('Copied to clipboard');
       });
     });
+
+    document.getElementById('prev-page')?.addEventListener('click', () => {
+      vscodeApi.postMessage({ type: 'page', direction: 'previous' });
+    });
+
+    document.getElementById('next-page')?.addEventListener('click', () => {
+      vscodeApi.postMessage({ type: 'page', direction: 'next' });
+    });
   </script>
 </body>
 </html>`;
 }
 
+async function loadPaymentsPage(pageIndex: number, cursors: (string | undefined)[]) {
+  const client = getFiberClient();
+  const after = cursors[pageIndex];
+  const result = await client.listPayments({ limit: PAYMENTS_PAGE_SIZE, after });
+  const hasNext = Boolean(result.lastCursor && result.payments.length >= PAYMENTS_PAGE_SIZE);
+
+  if (result.lastCursor) {
+    if (cursors.length === pageIndex + 1) {
+      cursors.push(result.lastCursor);
+    } else if (cursors.length > pageIndex + 1) {
+      cursors[pageIndex + 1] = result.lastCursor;
+      cursors.length = pageIndex + 1;
+    }
+  } else if (cursors.length > pageIndex + 1) {
+    cursors.length = pageIndex + 1;
+  }
+
+  const rangeLabel =
+    result.payments.length === 0
+      ? '0 items'
+      : `Page ${pageIndex + 1}${hasNext ? '+' : ''} · ${result.payments.length} item${result.payments.length === 1 ? '' : 's'}`;
+
+  return {
+    payments: result.payments,
+    pageIndex,
+    hasPrevious: pageIndex > 0,
+    hasNext,
+    rangeLabel,
+  } satisfies PaymentsPageState;
+}
+
 export async function viewPaymentsCommand(channel: vscode.OutputChannel): Promise<void> {
   try {
-    const result = await withRpcProgress('FiberGuard: loading payments…', async () => {
-      const client = getFiberClient();
-      return client.listPayments({ limit: 20 });
-    });
-    if (!result) return;
+    const firstPage = await withRpcProgress('FiberGuard: loading payments…', async () =>
+      loadPaymentsPage(0, [undefined]),
+    );
+    if (!firstPage) return;
 
-    if (result.payments.length === 0) {
+    if (firstPage.payments.length === 0) {
       void vscode.window.showInformationMessage(
         'No payments yet. Send a test payment from your Fiber node to populate history.',
       );
@@ -205,12 +298,51 @@ export async function viewPaymentsCommand(channel: vscode.OutputChannel): Promis
       vscode.ViewColumn.Active,
       { enableScripts: true, retainContextWhenHidden: true },
     );
-    panel.webview.html = renderPaymentsTable(result.payments);
-    panel.webview.onDidReceiveMessage((message: { type?: string; value?: string }) => {
-      if (message.type === 'copy' && message.value) {
-        void vscode.env.clipboard.writeText(message.value);
-      }
-    });
+
+    const cursors: (string | undefined)[] = [undefined];
+    let pageIndex = 0;
+    let loading = false;
+
+    const render = (state: PaymentsPageState) => {
+      panel.webview.html = renderPaymentsTable(state);
+    };
+
+    render(firstPage);
+
+    panel.webview.onDidReceiveMessage(
+      async (message: { type?: string; value?: string; direction?: string }) => {
+        if (message.type === 'copy' && message.value) {
+          void vscode.env.clipboard.writeText(message.value);
+          return;
+        }
+
+        if (message.type !== 'page' || loading) return;
+
+        if (message.direction === 'next') {
+          if (pageIndex + 1 >= cursors.length) return;
+          pageIndex += 1;
+        } else if (message.direction === 'previous') {
+          if (pageIndex === 0) return;
+          pageIndex -= 1;
+        } else {
+          return;
+        }
+
+        loading = true;
+        try {
+          const state = await loadPaymentsPage(pageIndex, cursors);
+          if (state.payments.length === 0 && pageIndex > 0) {
+            pageIndex -= 1;
+            return;
+          }
+          render(state);
+        } catch (error) {
+          reportError(channel, error);
+        } finally {
+          loading = false;
+        }
+      },
+    );
   } catch (error) {
     reportError(channel, error);
   }
