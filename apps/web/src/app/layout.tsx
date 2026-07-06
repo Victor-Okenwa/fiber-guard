@@ -6,6 +6,10 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'FiberGuard',
   description: 'Diagnostics and monitoring for Fiber nodes on Nervos CKB',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-icon.png',
+  }
 };
 
 export default function RootLayout({

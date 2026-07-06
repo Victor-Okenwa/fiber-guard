@@ -1,6 +1,6 @@
 'use client';
 
-import { CopyableText, CopyableTruncatedText } from '@/components/data/copyable-text';
+import { CopyableTruncatedText } from '@/components/data/copyable-text';
 import { StaleIndicator } from '@/components/data/stale-indicator';
 import { TableSkeleton } from '@/components/data/table-skeleton';
 import { NodeUnreachableAlert } from '@/components/node/node-unreachable-alert';
@@ -60,7 +60,7 @@ export function PeersView() {
                     <CopyableTruncatedText value={peer.pubkey} head={8} tail={6} />
                   </TableCell>
                   <TableCell className="max-w-xs text-xs">
-                    <CopyableText value={peer.address} />
+                    <CopyableTruncatedText value={peer.address} head={16} tail={10} />
                   </TableCell>
                   <TableCell>
                     <Badge>Connected</Badge>

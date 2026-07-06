@@ -7,6 +7,11 @@
   "private": true,
   "type": "module",
   "main": "./dist/extension.cjs",
+  "icon": "extension-icon.png",
+  "galleryBanner": {
+    "color": "#fff",
+    "theme": "light"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -76,7 +81,7 @@
         {
           "id": "fiberguard",
           "title": "FiberGuard",
-          "icon": "$(pulse)"
+          "icon": "$(shield)"
         }
       ]
     },

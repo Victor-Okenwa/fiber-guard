@@ -18,35 +18,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-svh flex-col md:flex-row">
-      <header className="flex items-center justify-between gap-2 border-b border-border bg-sidebar px-4 py-3 md:hidden">
-        <div>
-          <p className="text-sm font-semibold text-sidebar-primary">FiberGuard</p>
-          <p className="text-xs text-muted-foreground">Node diagnostics</p>
-        </div>
-        <ModeToggle />
-      </header>
+    <div className="flex h-svh flex-col overflow-hidden md:flex-row">
+      <div className="shrink-0 md:hidden">
+        <header className="flex items-center justify-between gap-2 border-b border-border bg-sidebar px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold text-sidebar-primary">FiberGuard</p>
+            <p className="text-xs text-muted-foreground">Node diagnostics</p>
+          </div>
+          <ModeToggle />
+        </header>
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-border bg-sidebar px-2 py-2 md:hidden">
-        {navItems.map((item) => {
-          const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                buttonVariants({ variant: 'ghost', size: 'sm' }),
-                'shrink-0',
-                isActive && 'bg-sidebar-accent text-sidebar-accent-foreground',
-              )}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+        <nav className="flex gap-1 overflow-x-auto border-b border-border bg-sidebar px-2 py-2">
+          {navItems.map((item) => {
+            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'shrink-0',
+                  isActive && 'bg-sidebar-accent text-sidebar-accent-foreground',
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
 
-      <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-sidebar text-sidebar-foreground md:flex">
+      <aside className="sticky top-0 hidden h-svh w-56 shrink-0 flex-col border-r border-border bg-sidebar text-sidebar-foreground md:flex">
         <div className="flex items-center justify-between gap-2 border-b border-sidebar-border p-4">
           <div>
             <p className="text-sm font-semibold text-sidebar-primary">FiberGuard</p>
@@ -74,7 +76,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
 
-      <main className="flex-1 overflow-auto p-4 sm:p-6">{children}</main>
+      <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
     </div>
   );
 }
