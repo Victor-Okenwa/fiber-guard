@@ -256,6 +256,52 @@ Project-specific AI guidance lives in [`.cursor/rules/`](.cursor/rules/):
 
 ---
 
+## Future features
+
+Planned work beyond the hackathon MVP. These stay in **Category 2** (node, routing, and diagnostics infrastructure) — reusable tooling for operators and Fiber app developers, not consumer wallet or merchant products.
+
+### Routing and payments
+
+| Feature | Description |
+|---------|-------------|
+| **Route simulation** | Dry-run routing without sending; show hop path, fees, and per-hop liquidity constraints before `sendPayment`. |
+| **Route quality analytics** | Track success rate, latency, and failure patterns per peer and channel over time. |
+| **Payment pre-flight API** | Shared `@fiberguard/diagnostics` endpoint for wallets and apps to call before initiating payments. |
+| **Invoice batch checks** | Validate multiple invoices or recurring payment targets in one pass for agent and game flows. |
+
+### On-chain and node context
+
+| Feature | Description |
+|---------|-------------|
+| **CKB on-chain context** | Surface funding confirmations, pending opens, and force-close progress via `packages/ckb-rpc` so off-chain failures are not misread as payment bugs. |
+| **Channel lifecycle timeline** | Unified view of pending → ready → closing states with plain-English status and next steps. |
+| **Multi-node profiles** | Switch between local dev, testnet demo, and operator nodes from dashboard and VS Code settings. |
+
+### Monitoring and alerting
+
+| Feature | Description |
+|---------|-------------|
+| **Health alerts** | Notify when peers disconnect, channels leave `ChannelReady`, or liquidity drops below thresholds. |
+| **Payment failure digests** | Overnight summaries of failed payments with top diagnostics and recommended fixes. |
+| **Uptime and SLO views** | Simple reliability metrics for nodes used in routing or app backends. |
+
+### Developer experience
+
+| Feature | Description |
+|---------|-------------|
+| **VS Code inline diagnostics** | Squiggles and quick-fix hints when Fiber RPC config or invoice strings look invalid in the editor. |
+| **Local test scenarios** | Scripted demo flows (healthy node, dry channel, unreachable peer) for hackathon and CI smoke tests. |
+| **Groq explanations (expanded)** | Optional AI summaries for complex multi-hop failures, with deterministic diagnostics always shown first. |
+
+### Ecosystem
+
+| Feature | Description |
+|---------|-------------|
+| **Embeddable diagnostics widget** | Drop-in React components from shared packages for other Fiber dashboards and tools. |
+| **Open metrics export** | Prometheus-friendly health and routing stats for operators who already run observability stacks. |
+
+---
+
 ## Roadmap
 
 - [x] Monorepo scaffold (pnpm workspaces, TypeScript, Biome, Turborepo)
@@ -263,9 +309,9 @@ Project-specific AI guidance lives in [`.cursor/rules/`](.cursor/rules/):
 - [x] Web dashboard — health, channels, peers, payments, can-i-pay
 - [x] VS Code extension — node status, can-i-pay, payment diagnose
 - [x] Vercel hosted demo (public testnet RPC)
-- [ ] Route simulation tools
-- [ ] CKB on-chain context in dashboard
-- [ ] Alerting for unhealthy nodes / weak routes
+- [ ] Route simulation tools — see [Future features](#future-features)
+- [ ] CKB on-chain context in dashboard — see [Future features](#future-features)
+- [ ] Alerting for unhealthy nodes / weak routes — see [Future features](#future-features)
 
 ---
 

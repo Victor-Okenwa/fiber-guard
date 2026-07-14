@@ -4,7 +4,7 @@
   "description": "Fiber node diagnostics in VS Code: health, channels, peers, payment failure analysis, and can-i-pay checks.",
   "version": "0.0.1",
   "license": "MIT",
-  "publisher": "fiberguard",
+  "publisher": "morse-code",
   "type": "module",
   "main": "./dist/extension.cjs",
   "icon": "extension-icon.png",
